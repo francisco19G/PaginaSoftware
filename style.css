@@ -1,0 +1,407 @@
+/* -----------------------------------------------------------
+   ESTILOS GENERALES Y VARIABLES DE COLOR (Basadas en tu imagen)
+----------------------------------------------------------- */
+:root {
+    --color-primary-terracotta: #B65D47;  /* Rojo-terracota de la paleta */
+    --color-bg-light: #F5F2ED;            /* Crema muy claro de la paleta */
+    --color-accent-green: #707A5E;        /* Verde oliva de la paleta */
+    --color-text-dark: #2F2A26;          /* Marrón-negro oscuro de la paleta */
+    
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--color-text-dark);
+    background-color: #fff; /* Fondo de la página blanco por defecto */
+    line-height: 1.6;
+}
+
+/* Contenedor centrado con ancho máximo */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+}
+
+a {
+    text-decoration: none;
+    color: inherit; /* Hereda el color del texto del padre */
+    cursor: pointer;
+}
+
+/* Estilo para las flechas hacia abajo de los dropdowns */
+.arrow-down {
+    font-size: 0.8em;
+    margin-left: 3px;
+    color: #a0a0a0; /* Gris suave para las flechas */
+}
+
+/* -----------------------------------------------------------
+   2. ESTILOS DE LA BARRA MEDIA (MIDDLE BAR)
+----------------------------------------------------------- */
+.middle-bar {
+    background-color: var(--color-bg-light); /* Fondo crema claro de la paleta */
+    padding: 15px 0;
+}
+
+.middle-bar-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Logo */
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo-icon {
+    font-size: 2rem;
+    position: relative;
+    color: var(--color-accent-green); /* Usamos el verde oliva para el icono */
+}
+
+/* Efecto simple de líneas de velocidad para el logo */
+.speed-lines::before,
+.speed-lines::after {
+    content: '';
+    position: absolute;
+    left: -12px;
+    height: 3px;
+    background-color: var(--color-accent-green);
+    border-radius: 2px;
+}
+
+.speed-lines::before {
+    top: 10px;
+    width: 8px;
+}
+
+.speed-lines::after {
+    top: 18px;
+    width: 12px;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+}
+
+/* Menú hamburguesa (visible en móvil, aquí siempre) */
+.hamburger-menu {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-text-dark);
+}
+
+/* Barra de búsqueda */
+.search-bar {
+    flex-grow: 1; /* Ocupa el espacio disponible */
+    display: flex;
+    background-color: #fff;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    overflow: hidden; /* Para que el botón y dropdown respeten el border-radius */
+    height: 45px;
+}
+
+.categories-dropdown {
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    border-right: 1px solid #dcdcdc;
+    font-size: 0.9rem;
+    color: #666;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.search-bar input {
+    flex-grow: 1;
+    border: none;
+    padding: 0 15px;
+    font-size: 1rem;
+    color: var(--color-text-dark);
+}
+
+.search-bar input::placeholder {
+    color: #a0a0a0;
+}
+
+.search-bar input:focus {
+    outline: none;
+}
+
+.search-button {
+    background: none;
+    border: none;
+    padding: 0 15px;
+    font-size: 1.2rem;
+    color: #666;
+    cursor: pointer;
+    border-left: 1px solid #dcdcdc;
+}
+
+/* Acciones de usuario (Iconos de la derecha) */
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 1.4rem;
+    color: var(--color-text-dark);
+}
+
+.icon-badge {
+    position: relative;
+    cursor: pointer;
+}
+
+.badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: #dcdcdc; /* Gris por defecto para la notificación */
+    color: #fff;
+    font-size: 0.7rem;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* El badge del carrito usa el color terracota principal */
+.badge-primary {
+    background-color: var(--color-primary-terracotta);
+}
+
+.icon-user {
+    color: #a0a0a0; /* El icono de usuario es gris en la imagen */
+    cursor: pointer;
+}
+
+/* -----------------------------------------------------------
+   3. ESTILOS DE LA BARRA DE NAVEGACIÓN (BOTTOM BAR)
+----------------------------------------------------------- */
+.navigation-bar {
+    background-color: var(--color-accent-green); /* Verde oliva de la paleta */
+    color: #fff;
+}
+
+.navigation-bar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px; /* Un poco de padding vertical */
+}
+
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+}
+
+.main-nav a {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #fff; /* Texto blanco sobre fondo verde */
+}
+
+/* Ajuste de flechas en el menú principal para que sean blancas */
+.main-nav .arrow-down {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.support-info {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.9;
+}
+
+.phone-icon {
+    font-size: 1.1rem;
+}
+/* Contenedor principal que cubre toda la pantalla */
+.auth-interface {
+    position: fixed; /* Fijo sobre todo lo demás */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.95); /* Fondo blanco con ligera transparencia */
+    z-index: 1000; /* Asegura que esté encima de todo */
+    overflow-y: auto; /* Permite scroll si el contenido es muy largo */
+    padding-top: 50px; /* Espacio para que no toque el borde superior */
+    transition: all 0.3s ease; /* Transición suave */
+    
+    /* Por defecto, está oculta */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Clase para mostrar la interfaz */
+.auth-interface.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Contenedor central de las dos columnas */
+.auth-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    gap: 60px; /* Espacio entre columnas */
+}
+
+/* Estilos comunes para las columnas */
+.auth-column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Títulos h2 */
+.auth-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+/* Etiquetas de formulario */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #555;
+    display: block;
+}
+
+/* Campos de entrada */
+.form-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #333;
+}
+
+.form-input::placeholder {
+    color: #a0a0a0;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-accent-green);
+    box-shadow: 0 0 0 2px rgba(112, 122, 94, 0.1);
+}
+
+/* Checkboxes y enlaces extra */
+.form-extras {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-accent-green); /* Usa el color verde oliva */
+}
+
+.forgot-password {
+    color: #2F2A26;
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+.forgot-password:hover {
+    opacity: 1;
+}
+
+/* Botones de Login y Register */
+.auth-button {
+    width: 100%;
+    background-color: var(--color-accent-green); /* Verde oliva de la paleta */
+    color: #fff;
+    border: none;
+    padding: 15px;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.auth-button:hover {
+    background-color: #5c654e; /* Un tono más oscuro para el hover */
+}
+
+/* Texto de "Already have an account?" */
+.already-account {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 25px;
+}
+
+.login-link {
+    color: var(--color-primary-terracotta); /* Terracota de la paleta */
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Botón de cierre (para que el usuario pueda salir) */
+.close-auth {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2rem;
+    color: #a0a0a0;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-auth:hover {
+    color: #333;
+}
+
+/* Media Query para móviles (apilar columnas) */
+@media (max-width: 768px) {
+    .auth-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}

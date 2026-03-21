@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bajar Interface Header con Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="main-header">
+        
+       
+
+        <div class="middle-bar">
+            <div class="container middle-bar-content">
+                
+                <div class="logo-area">
+                    <span class="logo-icon">&#128717;<span class="speed-lines"></span></span>
+                    <span class="logo-text">BAJAR</span>
+                </div>
+
+                <div class="hamburger-menu">
+                    &#9776; </div>
+
+                <div class="search-bar">
+                    <div class="categories-dropdown">
+                        All Categories <span class="arrow-down">&#9662;</span>
+                    </div>
+                    <input type="text" placeholder="I'm shopping for...">
+                    <button class="search-button">
+                        &#128269; </button>
+                </div>
+
+                <div class="user-actions">
+                    <div class="icon-badge">
+                        &#9825; <span class="badge">0</span>
+                    </div>
+                    <div class="icon-badge">
+                        &#128722; <span class="badge badge-primary">0</span>
+                    </div>
+                    <div id="userBtn" class="icon-user">
+                        &#128100; </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="navigation-bar">
+            <div class="container navigation-bar-content">
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="#">Home</a> <span class="arrow-down">&#9662;</span></li>
+                        <li><a href="#">Shop</a> <span class="arrow-down">&#9662;</span></li>
+                        <li><a href="#">Blog</a> <span class="arrow-down">&#9662;</span></li>
+                        <li><a href="#">Pages</a> <span class="arrow-down">&#9662;</span></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="support-info">
+                    <span class="phone-icon">&#9990;</span> Support: + (00) 123 456 789
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+    <div id="authInterface" class="auth-interface">
+        
+        <div id="closeAuth" class="close-auth">&#10006;</div>
+
+        <div class="auth-container">
+            
+            <div class="auth-column login-form">
+                <h2 class="auth-title">Iniciar Sesion</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Correo Electronico</label>
+                    <input type="text" class="form-input" placeholder="Correo">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" class="form-input" placeholder="Contraseña">
+                </div>
+
+                <div class="form-extras">
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="checkbox-input" id="rememberMe">
+                        <label for="Mantener sesion iniciada">Mantener sesion iniciada.</label>
+                    </div>
+                    <a href="#" class="Olvide mi contraseña">Olvide mi contraseña</a>
+                </div>
+
+                <button class="auth-button">Iniciar Sesion</button>
+            </div>
+
+            <div class="auth-column register-form">
+                <h2 class="auth-title">Registrarse</h2>
+
+                <div class="form-group">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" class="form-input" placeholder="Nombre">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Correo Electronico</label>
+                    <input type="email" class="form-input" placeholder="Correo Electronico">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" class="form-input" placeholder="Contraseña">
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" class="checkbox-input" id="acceptTerms">
+                    <label for="acceptTerms">Acepto los terminos y condiciones</label>
+                </div>
+
+                <button class="auth-button">Registrarse</button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Obtenemos las referencias de los elementos
+        const userBtn = document.getElementById('userBtn');
+        const authInterface = document.getElementById('authInterface');
+        const closeAuth = document.getElementById('closeAuth');
+
+        // Función para abrir la interfaz
+        userBtn.addEventListener('click', () => {
+            authInterface.classList.add('is-visible');
+            // Evitamos que la página principal haga scroll detrás
+            document.body.style.overflow = 'hidden'; 
+        });
+
+        // Función para cerrar la interfaz
+        function closeInterface() {
+            authInterface.classList.remove('is-visible');
+            // Devolvemos el scroll a la página principal
+            document.body.style.overflow = ''; 
+        }
+
+        // Clic en la 'X' para cerrar
+        closeAuth.addEventListener('click', closeInterface);
+
+        // Clic fuera del contenedor para cerrar
+        authInterface.addEventListener('click', (e) => {
+            // Si el clic fue en el fondo (el contenedor principal), no en el contenido central
+            if (e.target === authInterface) {
+                closeInterface();
+            }
+        });
+
+        // Opcional: Cerrar con la tecla 'Esc'
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && authInterface.classList.contains('is-visible')) {
+                closeInterface();
+            }
+        });
+    </script>
+
+</body>
+</html>
