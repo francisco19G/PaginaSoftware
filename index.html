@@ -182,7 +182,45 @@ btnRegistrar.onclick = async () => {
     } else {
         alert("Error: " + datos.error);
     }
-    
+    // Buscamos el botón de registro dentro de la vista de registro
+const btnRegistrar = document.querySelector('#registerView .auth-button');
+
+btnRegistrar.onclick = async () => {
+    // Obtenemos los valores de los cuadros de texto
+    const nombre = document.getElementById('regNombre').value;
+    const correo = document.getElementById('regCorreo').value;
+    const password = document.getElementById('regPass').value;
+
+    // Validación básica: que no envíen campos vacíos
+    if (!nombre || !correo || !password) {
+        alert("Por favor, llena todos los campos.");
+        return;
+    }
+
+    try {
+        const respuesta = await fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, correo, password })
+        });
+
+        const datos = await respuesta.json();
+
+        if (respuesta.ok) {
+            alert("¡Registro completado! Ahora puedes iniciar sesión.");
+            // Limpiar campos y cambiar a la vista de login
+            document.getElementById('regNombre').value = "";
+            document.getElementById('regCorreo').value = "";
+            document.getElementById('regPass').value = "";
+            document.getElementById('toggleLogin').click(); 
+        } else {
+            alert("Error: " + datos.error);
+        }
+    } catch (error) {
+        console.error("Error de conexión:", error);
+        alert("No se pudo conectar con el servidor.");
+    }
+};
 };
     </script>
 <input type="text" id="regNombre" class="form-input" placeholder="Tu nombre">

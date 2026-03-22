@@ -10,16 +10,21 @@ app.use(express.static(path.join(__dirname, '/')));
 const db = mysql.createConnection(process.env.DATABASE_URL || 'tu_url_local_aqui');
 
 // RUTA PARA REGISTRAR USUARIOS
+// Ruta de registro en script.js
 app.post('/register', (req, res) => {
-    const { NOMBRE, CORREO, Contrasena } = req.body;
-    const query = 'INSERT INTO USUARIOS (NOMBRE, CORREO, Contrasena) VALUES (?, ?, ?)';
+    const { nombre, correo, password } = req.body;
     
-    db.query(query, [NOMBRE, CORREO, Contrasena], (err, result) => {
+    // Definimos el rol como 'usuario' por defecto en el código
+    const rolPorDefecto = 'usuario';
+
+    const sql = "INSERT INTO usuarios (Nombre, Correo, Contrasena, Rol) VALUES (?, ?, ?, ?)";
+    
+    db.query(sql, [nombre, correo, password, rolPorDefecto], (err, result) => {
         if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Error al registrar usuario' });
+            console.error("Error en MySQL:", err);
+            return res.status(500).json({ error: "Error al registrar. ¿El correo ya existe?" });
         }
-        res.json({ message: 'Usuario registrado con éxito' });
+        res.json({ message: "¡Usuario registrado con éxito como 'usuario'!" });
     });
 });
 
