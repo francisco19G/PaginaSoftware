@@ -193,6 +193,41 @@
                 alert("No se pudo conectar con el servidor.");
             }
         };
+// Primero, asegúrate de tener los ID en el HTML: loginUser y loginPass
+const btnEntrar = document.querySelector('#loginView .auth-button');
+
+btnEntrar.onclick = async () => {
+    const correo = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value;
+
+    if (!correo || !password) {
+        alert("Por favor, ingresa tus credenciales.");
+        return;
+    }
+
+    try {
+        const respuesta = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ correo, password })
+        });
+
+        const datos = await respuesta.json();
+
+        if (respuesta.ok) {
+            alert(`¡Hola ${datos.user.nombre}! Has iniciado sesión.`);
+            // Aquí puedes redirigir o cerrar el modal
+            authInterface.classList.remove('is-visible');
+            // Cambiamos el icono de usuario por el nombre (opcional)
+            userBtn.innerHTML = `<span>${datos.user.nombre}</span>`;
+        } else {
+            alert("Error: " + datos.error);
+        }
+    } catch (error) {
+        console.error("Error en login:", error);
+        alert("No se pudo conectar con el servidor.");
+    }
+};
     </script>
 </body>
 </html>

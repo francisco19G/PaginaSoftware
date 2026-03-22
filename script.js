@@ -50,6 +50,36 @@ app.post('/register', (req, res) => {
         res.json({ message: "¡Usuario registrado con éxito!" });
     });
 });
+// --- RUTA PARA INICIAR SESIÓN ---
+app.post('/login', (req, res) => {
+    const { correo, password } = req.body;
+
+    console.log("Intento de login:", correo);
+
+    // Buscamos al usuario por correo y contraseña exactos
+    const sql = "SELECT * FROM USUARIOS WHERE Correo = ? AND Contrasena = ?";
+    
+    db.query(sql, [correo, password], (err, results) => {
+        if (err) {
+            console.error("Error en Login:", err.message);
+            return res.status(500).json({ error: "Error en el servidor al verificar datos." });
+        }
+
+        if (results.length > 0) {
+            // ¡Usuario encontrado!
+            const usuario = results[0];
+            console.log("✅ Login exitoso para:", usuario.Nombre);
+            
+            res.json({ 
+                message: "¡Bienvenido de nuevo!", 
+                user: { nombre: usuario.Nombre, rol: usuario.Rol } 
+            });
+        } else {
+            // No hubo coincidencias
+            res.status(401).json({ error: "Correo o contraseña incorrectos." });
+        }
+    });
+});
 // --- RUTA PRINCIPAL ---
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
