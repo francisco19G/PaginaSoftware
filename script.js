@@ -2,7 +2,8 @@ const express = require('express');
 const mysql = require('mysql2');
 const path = require('path');
 const app = express();
-
+app.use(express.json()); // <--- ¡SIN ESTA LÍNEA LOS DATOS LLEGAN VACÍOS!
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // Para poder leer datos JSON enviados desde el formulario
 app.use(express.static(path.join(__dirname, '/')));
 
