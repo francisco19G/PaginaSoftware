@@ -48,7 +48,7 @@ app.post('/register', (req, res) => {
     const { nombre, correo, password } = req.body;
     const codigo = Math.floor(100000 + Math.random() * 900000); // 6 dígitos
 
-    const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol, CodigoVerificacion) VALUES (?, ?, ?, 'usuario', ?)";
+    const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol, codigo_verificacion) VALUES (?, ?, ?, 'usuario', ?)";
     
     db.query(sql, [nombre, correo, password, codigo], (err, result) => {
         if (err) {
@@ -85,7 +85,8 @@ app.post('/register', (req, res) => {
 // --- RUTA: VERIFICAR CÓDIGO ---
 app.post('/verify', (req, res) => {
     const { correo, codigo } = req.body;
-    const sql = "UPDATE USUARIOS SET Verificado = TRUE WHERE Correo = ? AND CodigoVerificacion = ?";
+// Antes decía Verificado y CodigoVerificacion
+const sql = "UPDATE USUARIOS SET verificado = TRUE WHERE Correo = ? AND codigo_verificacion = ?";
 
     db.query(sql, [correo, codigo], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -111,9 +112,10 @@ app.post('/login', (req, res) => {
         if (results.length > 0) {
             const usuario = results[0];
             
-            if (!usuario.Verificado) {
-                return res.status(403).json({ error: "Tu cuenta no ha sido verificada. Revisa tu correo." });
-            }
+// Antes decía usuario.Verificado
+if (!usuario.verificado) { 
+    return res.status(403).json({ error: "Tu cuenta no ha sido verificada. Revisa tu correo." });
+}
 
             res.json({ 
                 message: "¡Bienvenido!", 
