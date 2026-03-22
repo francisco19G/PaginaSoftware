@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const path = require('path');
+const nodemailer = require('nodemailer');
 const app = express();
 
 // --- CONFIGURACIÓN DE MIDDLEWARE ---
@@ -9,169 +10,124 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '/')));
 
 // --- CONFIGURACIÓN DE BASE DE DATOS (POOL) ---
-// El Pool gestiona múltiples conexiones automáticamente, ideal para Render/Railway
-// En tu archivo script.js
 const db = mysql.createPool({
     uri: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    },
+    ssl: { rejectUnauthorized: false },
     waitForConnections: true,
     connectionLimit: 10
 });
-// Verificar conexión al iniciar el servidor
+
+// Verificar conexión DB
 db.getConnection((err, conn) => {
-    if (err) {
-        console.error("❌ Error de conexión a Railway:", err.message);
-    } else {
-        console.log("✅ ¡Conectado exitosamente a Railway!");
-        conn.release(); // Liberar la conexión de prueba
+    if (err) console.error("❌ Error DB:", err.message);
+    else {
+        console.log("✅ Conectado a Railway");
+        conn.release();
     }
 });
-app.post('/register', (req, res) => {
-    const { nombre, correo, password } = req.body;
-    const rolPorDefecto = 'usuario';
 
-    // Usamos USUARIOS en mayúsculas tal cual confirmaste
-    const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol) VALUES (?, ?, ?, ?)";
-    
-    db.query(sql, [nombre, correo, password, rolPorDefecto], (err, result) => {
-        if (err) {
-            // Imprime el error técnico en la consola de Render
-            console.error("DETALLE DE MYSQL:", err.message);
-            
-            // Enviamos el mensaje de error real al frontend para diagnóstico
-            return res.status(500).json({ 
-                error: "Error de base de datos: " + err.sqlMessage 
-            });
-        }
-        
-        console.log("✅ Registro exitoso en tabla USUARIOS");
-        res.json({ message: "¡Usuario registrado con éxito!" });
-    });
-});
-// --- RUTA PARA INICIAR SESIÓN ---
-app.post('/login', (req, res) => {
-    const { correo, password } = req.body;
-
-    console.log("Intento de login:", correo);
-
-    // Buscamos al usuario por correo y contraseña exactos
-    const sql = "SELECT * FROM USUARIOS WHERE Correo = ? AND Contrasena = ?";
-    
-    db.query(sql, [correo, password], (err, results) => {
-        if (err) {
-            console.error("Error en Login:", err.message);
-            return res.status(500).json({ error: "Error en el servidor al verificar datos." });
-        }
-
-        if (results.length > 0) {
-            // ¡Usuario encontrado!
-            const usuario = results[0];
-            console.log("✅ Login exitoso para:", usuario.Nombre);
-            
-            res.json({ 
-                message: "¡Bienvenido de nuevo!", 
-                user: { nombre: usuario.Nombre, rol: usuario.Rol } 
-            });
-        } else {
-            // No hubo coincidencias
-            res.status(401).json({ error: "Correo o contraseña incorrectos." });
-        }
-    });
-});
-// --- RUTA PRINCIPAL ---
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// --- INICIO DEL SERVIDOR ---
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor activo en http://localhost:${PORT}`);
-});
-const nodemailer = require('nodemailer');
-
-// 1. Configurar el transporte de correo (Usa variables de entorno en Render)
+// --- CONFIGURACIÓN DE CORREO (NODEMAILER) ---
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
-    secure: true, // true para puerto 465
+    secure: true, 
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     }
 });
 
-// 2. Modificar la ruta /register
-app.post('/register', (req, res) => {
-    const { nombre, correo, password } = req.body;
-    const codigo = Math.floor(100000 + Math.random() * 900000); // Genera 6 dígitos
-
-    const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol, CodigoVerificacion) VALUES (?, ?, ?, 'usuario', ?)";
-    
-    db.query(sql, [nombre, correo, password, codigo], (err, result) => {
-        if (err) return res.status(500).json({ error: err.sqlMessage });
-
-        // Enviar el correo
-        const mailOptions = {
-            from: '"BAJAR Tienda" <tu-correo@gmail.com>',
-            to: correo,
-            subject: 'Tu código de verificación',
-            html: `<h1>Bienvenido ${nombre}</h1><p>Tu código es: <b>${codigo}</b></p>`
-        };
-
-        transporter.sendMail(mailOptions, (error) => {
-            if (error) console.log("Error correo:", error);
-            res.json({ message: "Código enviado a tu correo" });
-        });
-    });
+// Verificar Cartero
+transporter.verify((error) => {
+    if (error) console.log("❌ Error Cartero:", error.message);
+    else console.log("✅ Cartero listo para enviar correos");
 });
 
-// 3. NUEVA RUTA: Confirmar Código
-app.post('/verify', (req, res) => {
-    const { correo, codigo } = req.body;
-    const sql = "UPDATE USUARIOS SET Verificado = TRUE WHERE Correo = ? AND CodigoVerificacion = ?";
-
-    db.query(sql, [correo, codigo], (err, result) => {
-        if (result.affectedRows > 0) {
-            res.json({ message: "Cuenta verificada con éxito" });
-        } else {
-            res.status(400).json({ error: "Código incorrecto" });
-        }
-    });
-});
+// --- RUTA: REGISTRO + ENVÍO DE CÓDIGO ---
 app.post('/register', (req, res) => {
     const { nombre, correo, password } = req.body;
-    const codigo = Math.floor(100000 + Math.random() * 900000);
+    const codigo = Math.floor(100000 + Math.random() * 900000); // 6 dígitos
 
     const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol, CodigoVerificacion) VALUES (?, ?, ?, 'usuario', ?)";
     
     db.query(sql, [nombre, correo, password, codigo], (err, result) => {
         if (err) {
             console.error("Error DB:", err.sqlMessage);
-            return res.status(500).json({ error: "Error en base de datos" });
+            return res.status(500).json({ error: "Error en base de datos: " + err.sqlMessage });
         }
 
-        // --- INTENTO DE ENVÍO DE CORREO ---
         const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: `"BAJAR Tienda" <${process.env.EMAIL_USER}>`,
             to: correo,
             subject: 'Tu código de verificación - BAJAR',
-            text: `Hola ${nombre}, tu código es: ${codigo}`
+            html: `
+                <div style="font-family: sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+                    <h2 style="color: #2F2A26;">¡Bienvenido a BAJAR, ${nombre}!</h2>
+                    <p>Usa el siguiente código para verificar tu cuenta:</p>
+                    <h1 style="background: #f4f4f4; padding: 10px; text-align: center; letter-spacing: 5px;">${codigo}</h1>
+                    <p>Si no solicitaste esto, ignora este correo.</p>
+                </div>`
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                // Si el correo falla, logueamos el error pero NO mandamos error 500 al usuario
                 console.error("❌ Falló el envío de correo:", error.message);
                 return res.json({ 
-                    message: "Usuario creado, pero hubo un error enviando el correo. Revisa los logs.",
+                    message: "Usuario creado, pero hubo un error enviando el correo.",
                     debug: error.message 
                 });
             }
-            console.log("✅ Correo enviado con éxito");
             res.json({ message: "Código enviado a tu correo" });
         });
     });
 });
+
+// --- RUTA: VERIFICAR CÓDIGO ---
+app.post('/verify', (req, res) => {
+    const { correo, codigo } = req.body;
+    const sql = "UPDATE USUARIOS SET Verificado = TRUE WHERE Correo = ? AND CodigoVerificacion = ?";
+
+    db.query(sql, [correo, codigo], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        if (result.affectedRows > 0) {
+            res.json({ message: "Cuenta verificada con éxito" });
+        } else {
+            res.status(400).json({ error: "Código incorrecto o correo no encontrado" });
+        }
+    });
+});
+
+// --- RUTA: LOGIN ---
+app.post('/login', (req, res) => {
+    const { correo, password } = req.body;
+
+    // Modificado para que solo deje entrar si está Verificado
+    const sql = "SELECT * FROM USUARIOS WHERE Correo = ? AND Contrasena = ?";
+    
+    db.query(sql, [correo, password], (err, results) => {
+        if (err) return res.status(500).json({ error: "Error en el servidor" });
+
+        if (results.length > 0) {
+            const usuario = results[0];
+            
+            if (!usuario.Verificado) {
+                return res.status(403).json({ error: "Tu cuenta no ha sido verificada. Revisa tu correo." });
+            }
+
+            res.json({ 
+                message: "¡Bienvenido!", 
+                user: { nombre: usuario.Nombre, rol: usuario.Rol } 
+            });
+        } else {
+            res.status(401).json({ error: "Correo o contraseña incorrectos" });
+        }
+    });
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Servidor en puerto ${PORT}`));

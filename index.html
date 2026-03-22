@@ -15,9 +15,7 @@
                     <span class="logo-icon">&#128717;<span class="speed-lines"></span></span>
                     <span class="logo-text">BAJAR</span>
                 </div>
-
                 <div class="hamburger-menu">&#9776;</div>
-
                 <div class="search-bar">
                     <div class="categories-dropdown">
                         All Categories <span class="arrow-down">&#9662;</span>
@@ -25,17 +23,10 @@
                     <input type="text" placeholder="I'm shopping for...">
                     <button class="search-button">&#128269;</button>
                 </div>
-
                 <div class="user-actions">
-                    <div class="icon-badge">
-                        &#9825; <span class="badge">0</span>
-                    </div>
-                    <div class="icon-badge">
-                        &#128722; <span class="badge badge-primary">0</span>
-                    </div>
-                    <div id="userBtn" class="icon-user" style="cursor: pointer;">
-                        &#128100;
-                    </div>
+                    <div class="icon-badge"> &#9825; <span class="badge">0</span> </div>
+                    <div class="icon-badge"> &#128722; <span class="badge badge-primary">0</span> </div>
+                    <div id="userBtn" class="icon-user" style="cursor: pointer;"> &#128100; </div>
                 </div>
             </div>
         </div>
@@ -70,42 +61,37 @@
     <div id="authInterface" class="auth-interface">
         <div class="auth-container single-column">
             <div id="closeAuth" class="close-auth">&#10006;</div>
-<div class="auth-column" id="verifyView" style="display: none;">
-    <h2 class="auth-title">Verifica tu correo</h2>
-    <p>Hemos enviado un código a tu email.</p>
-    <div class="form-group">
-        <input type="text" id="inputCodigo" class="form-input" placeholder="Código de 6 dígitos">
-    </div>
-    <button class="auth-button" id="btnConfirmarCodigo">Verificar</button>
-</div>
+
+            <div class="auth-column" id="verifyView" style="display: none;">
+                <h2 class="auth-title">Verifica tu correo</h2>
+                <p style="text-align: center; margin-bottom: 15px;">Hemos enviado un código a tu email.</p>
+                <div class="form-group">
+                    <input type="text" id="inputCodigo" class="form-input" placeholder="Código de 6 dígitos">
+                </div>
+                <button class="auth-button" id="btnConfirmarCodigo">Verificar Cuenta</button>
+            </div>
+
             <div class="auth-column" id="registerView">
                 <h2 class="auth-title">Crear Cuenta</h2>
-                
                 <div class="form-group">
                     <label class="form-label">Nombre de Usuario</label>
                     <input type="text" id="regNombre" class="form-input" placeholder="Tu nombre">
                 </div>
-
                 <div class="form-group">
                     <label class="form-label">Correo Electrónico</label>
                     <input type="email" id="regCorreo" class="form-input" placeholder="ejemplo@correo.com">
                 </div>
-
                 <div class="form-group">
                     <label class="form-label">Contraseña</label>
                     <input type="password" id="regPass" class="form-input" placeholder="Mínimo 8 caracteres">
                 </div>
-
                 <div class="form-group checkbox-group">
                     <input type="checkbox" class="checkbox-input" id="acceptTerms">
                     <label for="acceptTerms" class="checkbox-label">Acepto los términos y condiciones</label>
                 </div>
-
                 <button class="auth-button" id="btnRegistrarFinal">Registrarse</button>
-
                 <div class="already-account">
-                    ¿Ya tienes una cuenta? 
-                    <button id="toggleLogin" class="text-button">Iniciar Sesión</button>
+                    ¿Ya tienes una cuenta? <button id="toggleLogin" class="text-button">Iniciar Sesión</button>
                 </div>
             </div>
 
@@ -119,10 +105,9 @@
                     <label class="form-label">Contraseña</label>
                     <input type="password" id="loginPass" class="form-input" placeholder="Tu contraseña">
                 </div>
-                <button class="auth-button">Entrar</button>
+                <button class="auth-button" id="btnEntrarLogin">Entrar</button>
                 <div class="already-account">
-                    ¿No tienes cuenta? 
-                    <button id="toggleRegister" class="text-button">Registrarse</button>
+                    ¿No tienes cuenta? <button id="toggleRegister" class="text-button">Registrarse</button>
                 </div>
             </div>
         </div>
@@ -135,20 +120,33 @@
     </footer>
 
     <script>
+        // Elementos de la Interfaz
         const authInterface = document.getElementById('authInterface');
         const registerView = document.getElementById('registerView');
         const loginView = document.getElementById('loginView');
+        const verifyView = document.getElementById('verifyView');
+        
+        // Botones de Navegación
         const userBtn = document.getElementById('userBtn'); 
         const closeAuth = document.getElementById('closeAuth');
         const btnIrALogin = document.getElementById('toggleLogin');
         const btnIrARegistro = document.getElementById('toggleRegister');
+
+        // Botones de Acción
         const btnRegistrar = document.getElementById('btnRegistrarFinal');
+        const btnEntrar = document.getElementById('btnEntrarLogin');
+        const btnVerificar = document.getElementById('btnConfirmarCodigo');
 
-        // Abrir/Cerrar Modal
+        // --- NAVEGACIÓN DEL MODAL ---
         userBtn.onclick = () => authInterface.classList.add('is-visible');
-        closeAuth.onclick = () => authInterface.classList.remove('is-visible');
+        closeAuth.onclick = () => {
+            authInterface.classList.remove('is-visible');
+            // Resetear vistas al cerrar
+            registerView.style.display = 'flex';
+            loginView.style.display = 'none';
+            verifyView.style.display = 'none';
+        };
 
-        // Intercambio de Vistas
         btnIrALogin.onclick = () => {
             registerView.style.display = 'none';
             loginView.style.display = 'flex';
@@ -158,14 +156,11 @@
             registerView.style.display = 'flex';
         };
 
-        // Cerrar al hacer clic fuera
         window.onclick = (event) => {
-            if (event.target == authInterface) {
-                authInterface.classList.remove('is-visible');
-            }
+            if (event.target == authInterface) closeAuth.onclick();
         };
 
-        // LÓGICA DE REGISTRO
+        // --- LÓGICA DE REGISTRO ---
         btnRegistrar.onclick = async () => {
             const nombre = document.getElementById('regNombre').value.trim();
             const correo = document.getElementById('regCorreo').value.trim();
@@ -184,70 +179,77 @@
                 });
 
                 const datos = await respuesta.json();
-// ... dentro del fetch de /register ...
-if (respuesta.ok) {
-    alert("¡Código enviado! Revisa tu bandeja de entrada.");
-    
-    // Guardamos el correo para saber de quién es el código luego
-    localStorage.setItem('correoPendiente', correo);
-    
-    // Cambiamos de vista
-    registerView.style.display = 'none';
-    document.getElementById('verifyView').style.display = 'flex';
-}
- else {
+
+                if (respuesta.ok) {
+                    alert("¡Código enviado! Revisa tu bandeja de entrada.");
+                    localStorage.setItem('correoPendiente', correo);
+                    registerView.style.display = 'none';
+                    verifyView.style.display = 'flex';
+                } else {
                     alert("Error: " + (datos.error || "No se pudo registrar"));
                 }
             } catch (error) {
-                console.error("Error de conexión:", error);
-                alert("No se pudo conectar con el servidor.");
+                alert("Error de conexión con el servidor.");
             }
         };
-// --- LÓGICA DE LOGIN ---
-const btnEntrar = document.querySelector('#loginView .auth-button');
 
-btnEntrar.onclick = async () => {
-    const correo = document.getElementById('loginUser').value.trim();
-    const password = document.getElementById('loginPass').value;
+        // --- LÓGICA DE VERIFICACIÓN ---
+        btnVerificar.onclick = async () => {
+            const codigo = document.getElementById('inputCodigo').value.trim();
+            const correo = localStorage.getItem('correoPendiente');
 
-    if (!correo || !password) {
-        alert("Por favor, ingresa tu correo y contraseña.");
-        return;
-    }
+            if (!codigo) {
+                alert("Ingresa el código de 6 dígitos.");
+                return;
+            }
 
-    try {
-        const respuesta = await fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ correo, password })
-        });
+            try {
+                const respuesta = await fetch('/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ correo, codigo })
+                });
 
-        const datos = await respuesta.json();
+                const datos = await respuesta.json();
 
-        if (respuesta.ok) {
-            alert(`¡Bienvenido de nuevo, ${datos.user.nombre}!`);
-            
-            // 1. Ocultamos el modal
-            authInterface.classList.remove('is-visible');
+                if (respuesta.ok) {
+                    alert("¡Cuenta verificada! Ya puedes iniciar sesión.");
+                    localStorage.removeItem('correoPendiente');
+                    verifyView.style.display = 'none';
+                    loginView.style.display = 'flex';
+                } else {
+                    alert("Error: " + datos.error);
+                }
+            } catch (error) {
+                alert("Error al verificar código.");
+            }
+        };
 
-            // 2. Cambiamos el icono de usuario por el nombre en el header
-            document.getElementById('userBtn').innerHTML = `
-                <span style="font-size: 14px; font-weight: bold; color: #2F2A26;">
-                    Hola, ${datos.user.nombre}
-                </span>`;
-            
-            // 3. Opcional: Guardar sesión básica en el navegador
-            localStorage.setItem('usuarioNombre', datos.user.nombre);
+        // --- LÓGICA DE LOGIN ---
+        btnEntrar.onclick = async () => {
+            const correo = document.getElementById('loginUser').value.trim();
+            const password = document.getElementById('loginPass').value;
 
-        } else {
-            // Si el servidor responde 401 (Incorrecto) o 500
-            alert("Error: " + datos.error);
-        }
-    } catch (error) {
-        console.error("Error en la conexión de login:", error);
-        alert("No se pudo conectar con el servidor para iniciar sesión.");
-    }
-};
+            try {
+                const respuesta = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ correo, password })
+                });
+
+                const datos = await respuesta.json();
+
+                if (respuesta.ok) {
+                    alert(`¡Bienvenido, ${datos.user.nombre}!`);
+                    authInterface.classList.remove('is-visible');
+                    userBtn.innerHTML = `<span style="font-size: 14px; font-weight: bold;">Hola, ${datos.user.nombre}</span>`;
+                } else {
+                    alert("Error: " + datos.error);
+                }
+            } catch (error) {
+                alert("Error al iniciar sesión.");
+            }
+        };
     </script>
 </body>
 </html>
