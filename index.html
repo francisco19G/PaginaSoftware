@@ -11,7 +11,6 @@
     <header class="main-header">
         <div class="middle-bar">
             <div class="container middle-bar-content">
-                
                 <div class="logo-area">
                     <span class="logo-icon">&#128717;<span class="speed-lines"></span></span>
                     <span class="logo-text">BAJAR</span>
@@ -38,7 +37,6 @@
                         &#128100;
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -78,17 +76,17 @@
                 
                 <div class="form-group">
                     <label class="form-label">Nombre de Usuario</label>
-                    <input type="text" class="form-input" placeholder="Tu nombre">
+                    <input type="text" id="regNombre" class="form-input" placeholder="Tu nombre">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Correo Electrónico</label>
-                    <input type="email" class="form-input" placeholder="ejemplo@correo.com">
+                    <input type="email" id="regCorreo" class="form-input" placeholder="ejemplo@correo.com">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Contraseña</label>
-                    <input type="password" class="form-input" placeholder="Mínimo 8 caracteres">
+                    <input type="password" id="regPass" class="form-input" placeholder="Mínimo 8 caracteres">
                 </div>
 
                 <div class="form-group checkbox-group">
@@ -96,7 +94,7 @@
                     <label for="acceptTerms" class="checkbox-label">Acepto los términos y condiciones</label>
                 </div>
 
-                <button class="auth-button">Registrarse</button>
+                <button class="auth-button" id="btnRegistrarFinal">Registrarse</button>
 
                 <div class="already-account">
                     ¿Ya tienes una cuenta? 
@@ -108,11 +106,11 @@
                 <h2 class="auth-title">Iniciar Sesión</h2>
                 <div class="form-group">
                     <label class="form-label">Correo o Usuario</label>
-                    <input type="text" class="form-input" placeholder="Usuario/Email">
+                    <input type="text" id="loginUser" class="form-input" placeholder="Usuario/Email">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Contraseña</label>
-                    <input type="password" class="form-input" placeholder="Tu contraseña">
+                    <input type="password" id="loginPass" class="form-input" placeholder="Tu contraseña">
                 </div>
                 <button class="auth-button">Entrar</button>
                 <div class="already-account">
@@ -137,94 +135,64 @@
         const closeAuth = document.getElementById('closeAuth');
         const btnIrALogin = document.getElementById('toggleLogin');
         const btnIrARegistro = document.getElementById('toggleRegister');
+        const btnRegistrar = document.getElementById('btnRegistrarFinal');
 
-        userBtn.onclick = () => {
-            authInterface.classList.add('is-visible');
-        };
+        // Abrir/Cerrar Modal
+        userBtn.onclick = () => authInterface.classList.add('is-visible');
+        closeAuth.onclick = () => authInterface.classList.remove('is-visible');
 
-        closeAuth.onclick = () => {
-            authInterface.classList.remove('is-visible');
-        };
-
+        // Intercambio de Vistas
         btnIrALogin.onclick = () => {
             registerView.style.display = 'none';
             loginView.style.display = 'flex';
         };
-
         btnIrARegistro.onclick = () => {
             loginView.style.display = 'none';
             registerView.style.display = 'flex';
         };
 
+        // Cerrar al hacer clic fuera
         window.onclick = (event) => {
             if (event.target == authInterface) {
                 authInterface.classList.remove('is-visible');
             }
         };
-        const btnRegistrar = document.querySelector('#registerView .auth-button');
 
-btnRegistrar.onclick = async () => {
-    const nombre = document.getElementById('regNombre').value;
-    const correo = document.getElementById('regCorreo').value;
-    const password = document.getElementById('regPass').value;
+        // LÓGICA DE REGISTRO
+        btnRegistrar.onclick = async () => {
+            const nombre = document.getElementById('regNombre').value.trim();
+            const correo = document.getElementById('regCorreo').value.trim();
+            const password = document.getElementById('regPass').value;
 
-    const respuesta = await fetch('/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, correo, password })
-    });
+            if (!nombre || !correo || !password) {
+                alert("Por favor, llena todos los campos.");
+                return;
+            }
 
-    const datos = await respuesta.json();
-    
-    if (respuesta.ok) {
-        alert("¡Registro exitoso! Ya puedes iniciar sesión.");
-        btnIrALogin.click(); // Cambia automáticamente a la vista de Login
-    } else {
-        alert("Error: " + datos.error);
-    }
-    // Buscamos el botón de registro dentro de la vista de registro
-const btnRegistrar = document.querySelector('#registerView .auth-button');
+            try {
+                const respuesta = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, correo, password })
+                });
 
-btnRegistrar.onclick = async () => {
-    // Obtenemos los valores de los cuadros de texto
-    const nombre = document.getElementById('regNombre').value;
-    const correo = document.getElementById('regCorreo').value;
-    const password = document.getElementById('regPass').value;
+                const datos = await respuesta.json();
 
-    // Validación básica: que no envíen campos vacíos
-    if (!nombre || !correo || !password) {
-        alert("Por favor, llena todos los campos.");
-        return;
-    }
-
-    try {
-        const respuesta = await fetch('/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, correo, password })
-        });
-
-        const datos = await respuesta.json();
-
-        if (respuesta.ok) {
-            alert("¡Registro completado! Ahora puedes iniciar sesión.");
-            // Limpiar campos y cambiar a la vista de login
-            document.getElementById('regNombre').value = "";
-            document.getElementById('regCorreo').value = "";
-            document.getElementById('regPass').value = "";
-            document.getElementById('toggleLogin').click(); 
-        } else {
-            alert("Error: " + datos.error);
-        }
-    } catch (error) {
-        console.error("Error de conexión:", error);
-        alert("No se pudo conectar con el servidor.");
-    }
-};
-};
+                if (respuesta.ok) {
+                    alert("¡Registro completado! Ahora puedes iniciar sesión.");
+                    // Limpiar y cambiar a login
+                    document.getElementById('regNombre').value = "";
+                    document.getElementById('regCorreo').value = "";
+                    document.getElementById('regPass').value = "";
+                    btnIrALogin.click(); 
+                } else {
+                    alert("Error: " + (datos.error || "No se pudo registrar"));
+                }
+            } catch (error) {
+                console.error("Error de conexión:", error);
+                alert("No se pudo conectar con el servidor.");
+            }
+        };
     </script>
-<input type="text" id="regNombre" class="form-input" ...>
-<input type="email" id="regCorreo" class="form-input" ...>
-<input type="password" id="regPass" class="form-input" ...>
 </body>
 </html>
