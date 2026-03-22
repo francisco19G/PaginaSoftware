@@ -26,36 +26,28 @@ db.getConnection((err, conn) => {
         conn.release(); // Liberar la conexión de prueba
     }
 });
-
-// --- RUTA PARA REGISTRAR USUARIOS ---
 app.post('/register', (req, res) => {
-    // Extraemos los datos del cuerpo de la petición
     const { nombre, correo, password } = req.body;
-    
-    // Rol asignado automáticamente
     const rolPorDefecto = 'usuario';
 
-    // SQL usando los nombres exactos de tus columnas
+    // Usamos USUARIOS en mayúsculas tal cual confirmaste
     const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol) VALUES (?, ?, ?, ?)";
     
     db.query(sql, [nombre, correo, password, rolPorDefecto], (err, result) => {
         if (err) {
-            // Imprimimos el error real en la consola de Render para diagnóstico
-            console.error("❌ Error en MySQL:", err.code, "-", err.sqlMessage);
+            // Imprime el error técnico en la consola de Render
+            console.error("DETALLE DE MYSQL:", err.message);
             
-            // Si el error es por correo duplicado (Unique Key)
-            if (err.code === 'ER_DUP_ENTRY') {
-                return res.status(400).json({ error: "Este correo ya está registrado." });
-            }
-
-            return res.status(500).json({ error: "Error interno al registrar el usuario." });
+            // Enviamos el mensaje de error real al frontend para diagnóstico
+            return res.status(500).json({ 
+                error: "Error de base de datos: " + err.sqlMessage 
+            });
         }
         
-        console.log("👤 Usuario registrado con éxito:", correo);
-        res.json({ message: "¡Usuario registrado con éxito como 'usuario'!" });
+        console.log("✅ Registro exitoso en tabla USUARIOS");
+        res.json({ message: "¡Usuario registrado con éxito!" });
     });
 });
-
 // --- RUTA PRINCIPAL ---
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
