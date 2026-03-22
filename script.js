@@ -11,10 +11,10 @@ const db = mysql.createConnection(process.env.DATABASE_URL || 'tu_url_local_aqui
 
 // RUTA PARA REGISTRAR USUARIOS
 app.post('/register', (req, res) => {
-    const { NOMBRE, CORREO, CONTRASEÑA } = req.body;
-    const query = 'INSERT INTO USUARIOS (NOMBRE, CORREO, CONTRASEÑA) VALUES (?, ?, ?)';
+    const { NOMBRE, CORREO, Contrasena } = req.body;
+    const query = 'INSERT INTO USUARIOS (NOMBRE, CORREO, Contrasena) VALUES (?, ?, ?)';
     
-    db.query(query, [NOMBRE, CORREO, CONTRASEÑA], (err, result) => {
+    db.query(query, [NOMBRE, CORREO, Contrasena], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: 'Error al registrar usuario' });
