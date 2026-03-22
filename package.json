@@ -4,7 +4,7 @@
   "description": "��#\u0000 \u0000P\u0000a\u0000g\u0000i\u0000n\u0000a\u0000S\u0000o\u0000f\u0000t\u0000w\u0000a\u0000r\u0000e\u0000\r\u0000 \u0000",
   "main": "script.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node script.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/francisco19G/PaginaSoftware#readme",
   "dependencies": {
+    "express": "^5.2.1",
     "mysql2": "^3.20.0"
   }
 }
