@@ -247,40 +247,7 @@ btnEntrar.onclick = async () => {
         console.error("Error en la conexión de login:", error);
         alert("No se pudo conectar con el servidor para iniciar sesión.");
     }
-};app.post('/register', (req, res) => {
-    const { nombre, correo, password } = req.body;
-    const codigo = Math.floor(100000 + Math.random() * 900000);
-
-    const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol, CodigoVerificacion) VALUES (?, ?, ?, 'usuario', ?)";
-    
-    db.query(sql, [nombre, correo, password, codigo], (err, result) => {
-        if (err) {
-            console.error("Error DB:", err.sqlMessage);
-            return res.status(500).json({ error: "Error en base de datos" });
-        }
-
-        // --- INTENTO DE ENVÍO DE CORREO ---
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: correo,
-            subject: 'Tu código de verificación - BAJAR',
-            text: `Hola ${nombre}, tu código es: ${codigo}`
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                // Si el correo falla, logueamos el error pero NO mandamos error 500 al usuario
-                console.error("❌ Falló el envío de correo:", error.message);
-                return res.json({ 
-                    message: "Usuario creado, pero hubo un error enviando el correo. Revisa los logs.",
-                    debug: error.message 
-                });
-            }
-            console.log("✅ Correo enviado con éxito");
-            res.json({ message: "Código enviado a tu correo" });
-        });
-    });
-});
+};
     </script>
 </body>
 </html>
