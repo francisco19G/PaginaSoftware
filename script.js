@@ -10,13 +10,15 @@ app.use(express.static(path.join(__dirname, '/')));
 
 // --- CONFIGURACIÓN DE BASE DE DATOS (POOL) ---
 // El Pool gestiona múltiples conexiones automáticamente, ideal para Render/Railway
+// En tu archivo script.js
 const db = mysql.createPool({
     uri: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    },
     waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+    connectionLimit: 10
 });
-
 // Verificar conexión al iniciar el servidor
 db.getConnection((err, conn) => {
     if (err) {
