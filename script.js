@@ -7,9 +7,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // Para poder leer datos JSON enviados desde el formulario
 app.use(express.static(path.join(__dirname, '/')));
 
-// Configuración de la conexión a Railway (usa tu Variable de Entorno)
-const db = mysql.createConnection(process.env.DATABASE_URL || 'tu_url_local_aqui');
 
+// En tu script.js
+const mysql = require('mysql2');
+
+// Crear el pool de conexión usando la URL pública de la variable de entorno
+const db = mysql.createPool(process.env.DATABASE_URL);
+
+// Prueba la conexión inmediatamente para ver si hay errores en el log
+db.getConnection((err, connection) => {
+    if (err) {
+        console.error("Fallo total de conexión a Railway:", err.message);
+    } else {
+        console.log("¡Conectado exitosamente a Railway vía URL Pública!");
+        connection.release();
+    }
+});
 // RUTA PARA REGISTRAR USUARIOS
 // Ruta de registro en script.js
 app.post('/register', (req, res) => {
