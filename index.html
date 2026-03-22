@@ -62,15 +62,6 @@
         <div class="auth-container single-column">
             <div id="closeAuth" class="close-auth">&#10006;</div>
 
-            <div class="auth-column" id="verifyView" style="display: none;">
-                <h2 class="auth-title">Verifica tu correo</h2>
-                <p style="text-align: center; margin-bottom: 15px;">Hemos enviado un código a tu email.</p>
-                <div class="form-group">
-                    <input type="text" id="inputCodigo" class="form-input" placeholder="Código de 6 dígitos">
-                </div>
-                <button class="auth-button" id="btnConfirmarCodigo">Verificar Cuenta</button>
-            </div>
-
             <div class="auth-column" id="registerView">
                 <h2 class="auth-title">Crear Cuenta</h2>
                 <div class="form-group">
@@ -120,135 +111,72 @@
     </footer>
 
     <script>
-        // Elementos de la Interfaz
         const authInterface = document.getElementById('authInterface');
         const registerView = document.getElementById('registerView');
         const loginView = document.getElementById('loginView');
-        const verifyView = document.getElementById('verifyView');
-        
-        // Botones de Navegación
         const userBtn = document.getElementById('userBtn'); 
         const closeAuth = document.getElementById('closeAuth');
         const btnIrALogin = document.getElementById('toggleLogin');
         const btnIrARegistro = document.getElementById('toggleRegister');
-
-        // Botones de Acción
         const btnRegistrar = document.getElementById('btnRegistrarFinal');
         const btnEntrar = document.getElementById('btnEntrarLogin');
-        const btnVerificar = document.getElementById('btnConfirmarCodigo');
 
-        // --- NAVEGACIÓN DEL MODAL ---
+        // Navegación básica
         userBtn.onclick = () => authInterface.classList.add('is-visible');
-        closeAuth.onclick = () => {
-            authInterface.classList.remove('is-visible');
-            // Resetear vistas al cerrar
-            registerView.style.display = 'flex';
-            loginView.style.display = 'none';
-            verifyView.style.display = 'none';
-        };
+        closeAuth.onclick = () => authInterface.classList.remove('is-visible');
+        btnIrALogin.onclick = () => { registerView.style.display = 'none'; loginView.style.display = 'flex'; };
+        btnIrARegistro.onclick = () => { loginView.style.display = 'none'; registerView.style.display = 'flex'; };
 
-        btnIrALogin.onclick = () => {
-            registerView.style.display = 'none';
-            loginView.style.display = 'flex';
-        };
-        btnIrARegistro.onclick = () => {
-            loginView.style.display = 'none';
-            registerView.style.display = 'flex';
-        };
+        window.onclick = (e) => { if (e.target == authInterface) closeAuth.onclick(); };
 
-        window.onclick = (event) => {
-            if (event.target == authInterface) closeAuth.onclick();
-        };
-
-        // --- LÓGICA DE REGISTRO ---
+        // REGISTRO
         btnRegistrar.onclick = async () => {
             const nombre = document.getElementById('regNombre').value.trim();
             const correo = document.getElementById('regCorreo').value.trim();
             const password = document.getElementById('regPass').value;
 
-            if (!nombre || !correo || !password) {
-                alert("Por favor, llena todos los campos.");
-                return;
-            }
+            if (!nombre || !correo || !password) return alert("Llena todos los campos.");
 
             try {
-                const respuesta = await fetch('/register', {
+                const res = await fetch('/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nombre, correo, password })
                 });
+                const datos = await res.json();
 
-                const datos = await respuesta.json();
-
-                if (respuesta.ok) {
-                    alert("¡Código enviado! Revisa tu bandeja de entrada.");
-                    localStorage.setItem('correoPendiente', correo);
+                if (res.ok || datos.success) {
+                    alert(datos.message);
+                    // Cambiar automáticamente a la vista de Login
                     registerView.style.display = 'none';
-                    verifyView.style.display = 'flex';
-                } else {
-                    alert("Error: " + (datos.error || "No se pudo registrar"));
-                }
-            } catch (error) {
-                alert("Error de conexión con el servidor.");
-            }
-        };
-
-        // --- LÓGICA DE VERIFICACIÓN ---
-        btnVerificar.onclick = async () => {
-            const codigo = document.getElementById('inputCodigo').value.trim();
-            const correo = localStorage.getItem('correoPendiente');
-
-            if (!codigo) {
-                alert("Ingresa el código de 6 dígitos.");
-                return;
-            }
-
-            try {
-                const respuesta = await fetch('/verify', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ correo, codigo })
-                });
-
-                const datos = await respuesta.json();
-
-                if (respuesta.ok) {
-                    alert("¡Cuenta verificada! Ya puedes iniciar sesión.");
-                    localStorage.removeItem('correoPendiente');
-                    verifyView.style.display = 'none';
                     loginView.style.display = 'flex';
                 } else {
                     alert("Error: " + datos.error);
                 }
-            } catch (error) {
-                alert("Error al verificar código.");
-            }
+            } catch (err) { alert("Error de conexión."); }
         };
 
-        // --- LÓGICA DE LOGIN ---
+        // LOGIN
         btnEntrar.onclick = async () => {
             const correo = document.getElementById('loginUser').value.trim();
             const password = document.getElementById('loginPass').value;
 
             try {
-                const respuesta = await fetch('/login', {
+                const res = await fetch('/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ correo, password })
                 });
+                const datos = await res.json();
 
-                const datos = await respuesta.json();
-
-                if (respuesta.ok) {
+                if (res.ok) {
                     alert(`¡Bienvenido, ${datos.user.nombre}!`);
                     authInterface.classList.remove('is-visible');
                     userBtn.innerHTML = `<span style="font-size: 14px; font-weight: bold;">Hola, ${datos.user.nombre}</span>`;
                 } else {
                     alert("Error: " + datos.error);
                 }
-            } catch (error) {
-                alert("Error al iniciar sesión.");
-            }
+            } catch (err) { alert("Error al iniciar sesión."); }
         };
     </script>
 </body>

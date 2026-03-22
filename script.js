@@ -1,7 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2');
 const path = require('path');
-const nodemailer = require('nodemailer');
 const app = express();
 
 // --- CONFIGURACIÓN DE MIDDLEWARE ---
@@ -26,74 +25,21 @@ db.getConnection((err, conn) => {
     }
 });
 
-// --- CONFIGURACIÓN DE CORREO (NODEMAILER) ---
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, 
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
-
-// Verificar Cartero
-transporter.verify((error) => {
-    if (error) console.log("❌ Error Cartero:", error.message);
-    else console.log("✅ Cartero listo para enviar correos");
-});
-
+// --- RUTA: REGISTRO DIRECTO ---
 app.post('/register', (req, res) => {
     const { nombre, correo, password } = req.body;
-    const codigo = Math.floor(100000 + Math.random() * 900000);
 
-    // 1. Guardar en la DB (Asegúrate que los nombres coincidan con Railway)
-    const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol, codigo_verificacion) VALUES (?, ?, ?, 'usuario', ?)";
+    // Al registrar, ponemos 'verificado = 1' (true) de una vez para saltar el código
+    const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol, verificado) VALUES (?, ?, ?, 'usuario', 1)";
     
-    db.query(sql, [nombre, correo, password, codigo], (err, result) => {
+    db.query(sql, [nombre, correo, password], (err, result) => {
         if (err) {
-            console.error("Error DB:", err.sqlMessage);
-            return res.status(500).json({ error: "Error en base de datos: " + err.sqlMessage });
+            console.error("❌ Error DB:", err.sqlMessage);
+            return res.status(500).json({ error: "Error: El correo ya existe o la base de datos falló." });
         }
 
-        // 2. Intentar enviar el correo
-        const mailOptions = {
-            from: `"BAJAR Tienda" <${process.env.EMAIL_USER}>`,
-            to: correo,
-            subject: 'Tu código de verificación - BAJAR',
-            html: `<h3>Hola ${nombre}, tu código es: <b>${codigo}</b></h3>`
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                // Si el correo falla, avisamos pero confirmamos que el usuario se creó
-                console.error("❌ Error Nodemailer:", error.message);
-                return res.json({ 
-                    success: true, 
-                    message: "Usuario creado, pero hubo un error enviando el correo.",
-                    debug: error.message 
-                });
-            }
-            console.log("✅ Correo enviado a:", correo);
-            res.json({ success: true, message: "Código enviado a tu correo" });
-        });
-    });
-});
-
-// --- RUTA: VERIFICAR CÓDIGO ---
-app.post('/verify', (req, res) => {
-    const { correo, codigo } = req.body;
-// Antes decía Verificado y CodigoVerificacion
-const sql = "UPDATE USUARIOS SET verificado = TRUE WHERE Correo = ? AND codigo_verificacion = ?";
-
-    db.query(sql, [correo, codigo], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
-
-        if (result.affectedRows > 0) {
-            res.json({ message: "Cuenta verificada con éxito" });
-        } else {
-            res.status(400).json({ error: "Código incorrecto o correo no encontrado" });
-        }
+        console.log("✅ Usuario registrado y verificado automáticamente:", correo);
+        res.json({ success: true, message: "¡Registro exitoso! Ya puedes iniciar sesión." });
     });
 });
 
@@ -101,7 +47,6 @@ const sql = "UPDATE USUARIOS SET verificado = TRUE WHERE Correo = ? AND codigo_v
 app.post('/login', (req, res) => {
     const { correo, password } = req.body;
 
-    // Modificado para que solo deje entrar si está Verificado
     const sql = "SELECT * FROM USUARIOS WHERE Correo = ? AND Contrasena = ?";
     
     db.query(sql, [correo, password], (err, results) => {
@@ -110,12 +55,13 @@ app.post('/login', (req, res) => {
         if (results.length > 0) {
             const usuario = results[0];
             
-// Antes decía usuario.Verificado
-if (!usuario.verificado) { 
-    return res.status(403).json({ error: "Tu cuenta no ha sido verificada. Revisa tu correo." });
-}
+            // Aunque saltamos el código, mantenemos la validación por si acaso
+            if (!usuario.verificado) { 
+                return res.status(403).json({ error: "Cuenta no verificada." });
+            }
 
             res.json({ 
+                success: true,
                 message: "¡Bienvenido!", 
                 user: { nombre: usuario.Nombre, rol: usuario.Rol } 
             });
@@ -130,4 +76,4 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Servidor en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Servidor activo en puerto ${PORT}`));
