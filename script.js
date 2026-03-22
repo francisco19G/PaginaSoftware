@@ -90,3 +90,52 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor activo en http://localhost:${PORT}`);
 });
+const nodemailer = require('nodemailer');
+
+// 1. Configurar el transporte de correo (Usa variables de entorno en Render)
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER, // Tu correo
+        pass: process.env.EMAIL_PASS  // Tu "Contraseña de aplicación" de Google
+    }
+});
+
+// 2. Modificar la ruta /register
+app.post('/register', (req, res) => {
+    const { nombre, correo, password } = req.body;
+    const codigo = Math.floor(100000 + Math.random() * 900000); // Genera 6 dígitos
+
+    const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol, CodigoVerificacion) VALUES (?, ?, ?, 'usuario', ?)";
+    
+    db.query(sql, [nombre, correo, password, codigo], (err, result) => {
+        if (err) return res.status(500).json({ error: err.sqlMessage });
+
+        // Enviar el correo
+        const mailOptions = {
+            from: '"BAJAR Tienda" <tu-correo@gmail.com>',
+            to: correo,
+            subject: 'Tu código de verificación',
+            html: `<h1>Bienvenido ${nombre}</h1><p>Tu código es: <b>${codigo}</b></p>`
+        };
+
+        transporter.sendMail(mailOptions, (error) => {
+            if (error) console.log("Error correo:", error);
+            res.json({ message: "Código enviado a tu correo" });
+        });
+    });
+});
+
+// 3. NUEVA RUTA: Confirmar Código
+app.post('/verify', (req, res) => {
+    const { correo, codigo } = req.body;
+    const sql = "UPDATE USUARIOS SET Verificado = TRUE WHERE Correo = ? AND CodigoVerificacion = ?";
+
+    db.query(sql, [correo, codigo], (err, result) => {
+        if (result.affectedRows > 0) {
+            res.json({ message: "Cuenta verificada con éxito" });
+        } else {
+            res.status(400).json({ error: "Código incorrecto" });
+        }
+    });
+});

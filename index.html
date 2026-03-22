@@ -70,7 +70,14 @@
     <div id="authInterface" class="auth-interface">
         <div class="auth-container single-column">
             <div id="closeAuth" class="close-auth">&#10006;</div>
-
+<div class="auth-column" id="verifyView" style="display: none;">
+    <h2 class="auth-title">Verifica tu correo</h2>
+    <p>Hemos enviado un código a tu email.</p>
+    <div class="form-group">
+        <input type="text" id="inputCodigo" class="form-input" placeholder="Código de 6 dígitos">
+    </div>
+    <button class="auth-button" id="btnConfirmarCodigo">Verificar</button>
+</div>
             <div class="auth-column" id="registerView">
                 <h2 class="auth-title">Crear Cuenta</h2>
                 
@@ -177,15 +184,18 @@
                 });
 
                 const datos = await respuesta.json();
-
-                if (respuesta.ok) {
-                    alert("¡Registro completado! Ahora puedes iniciar sesión.");
-                    // Limpiar y cambiar a login
-                    document.getElementById('regNombre').value = "";
-                    document.getElementById('regCorreo').value = "";
-                    document.getElementById('regPass').value = "";
-                    btnIrALogin.click(); 
-                } else {
+// ... dentro del fetch de /register ...
+if (respuesta.ok) {
+    alert("¡Código enviado! Revisa tu bandeja de entrada.");
+    
+    // Guardamos el correo para saber de quién es el código luego
+    localStorage.setItem('correoPendiente', correo);
+    
+    // Cambiamos de vista
+    registerView.style.display = 'none';
+    document.getElementById('verifyView').style.display = 'flex';
+}
+ else {
                     alert("Error: " + (datos.error || "No se pudo registrar"));
                 }
             } catch (error) {
@@ -236,6 +246,42 @@ btnEntrar.onclick = async () => {
     } catch (error) {
         console.error("Error en la conexión de login:", error);
         alert("No se pudo conectar con el servidor para iniciar sesión.");
+    }
+};
+// --- LÓGICA PARA VERIFICAR CÓDIGO ---
+const btnVerificar = document.getElementById('btnConfirmarCodigo');
+const verifyView = document.getElementById('verifyView');
+
+btnVerificar.onclick = async () => {
+    const codigo = document.getElementById('inputCodigo').value.trim();
+    const correo = localStorage.getItem('correoPendiente'); // El correo que guardamos al registrar
+
+    if (!codigo) {
+        alert("Por favor, ingresa el código de 6 dígitos.");
+        return;
+    }
+
+    try {
+        const respuesta = await fetch('/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ correo, codigo })
+        });
+
+        const datos = await respuesta.json();
+
+        if (respuesta.ok) {
+            alert("¡Cuenta verificada con éxito! Ahora puedes iniciar sesión.");
+            // Limpiamos y mandamos al login
+            localStorage.removeItem('correoPendiente');
+            verifyView.style.display = 'none';
+            loginView.style.display = 'flex';
+        } else {
+            alert("Error: " + datos.error);
+        }
+    } catch (error) {
+        console.error("Error en verificación:", error);
+        alert("No se pudo conectar con el servidor.");
     }
 };
     </script>
