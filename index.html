@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bajar Interface Header con Login</title>
+    <title>Bajar - Tienda Online</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header class="main-header">
-        
-       
-
         <div class="middle-bar">
             <div class="container middle-bar-content">
                 
@@ -20,16 +17,14 @@
                     <span class="logo-text">BAJAR</span>
                 </div>
 
-                <div class="hamburger-menu">
-                    &#9776; </div>
+                <div class="hamburger-menu">&#9776;</div>
 
                 <div class="search-bar">
                     <div class="categories-dropdown">
                         All Categories <span class="arrow-down">&#9662;</span>
                     </div>
                     <input type="text" placeholder="I'm shopping for...">
-                    <button class="search-button">
-                        &#128269; </button>
+                    <button class="search-button">&#128269;</button>
                 </div>
 
                 <div class="user-actions">
@@ -39,8 +34,9 @@
                     <div class="icon-badge">
                         &#128722; <span class="badge badge-primary">0</span>
                     </div>
-                    <div id="userBtn" class="icon-user">
-                        &#128100; </div>
+                    <div id="userBtn" class="icon-user" style="cursor: pointer;">
+                        &#128100;
+                    </div>
                 </div>
 
             </div>
@@ -62,107 +58,111 @@
                 </div>
             </div>
         </div>
-
     </header>
 
-    <div id="authInterface" class="auth-interface">
-        
-        <div id="closeAuth" class="close-auth">&#10006;</div>
+    <main class="main-content" style="display: flex; align-items: center; justify-content: center; flex: 1;">
+        <div class="container">
+            <div style="text-align: center; padding: 60px 20px; color: #7f8c8d; border: 2px dashed #dcdde1; border-radius: 8px; margin: 40px auto; max-width: 800px;">
+                <h2>Bienvenido a BAJAR</h2>
+                <p>Tu tienda está lista. El contenido principal ahora ocupa toda la pantalla y el footer se mantiene al fondo.</p>
+            </div>
+        </div>
+    </main>
 
-        <div class="auth-container">
-            
-            <div class="auth-column login-form">
-                <h2 class="auth-title">Iniciar Sesion</h2>
+    <div id="authInterface" class="auth-interface">
+        <div class="auth-container single-column">
+            <div id="closeAuth" class="close-auth">&#10006;</div>
+
+            <div class="auth-column" id="registerView">
+                <h2 class="auth-title">Crear Cuenta</h2>
                 
                 <div class="form-group">
-                    <label class="form-label">Correo Electronico</label>
-                    <input type="text" class="form-input" placeholder="Correo">
+                    <label class="form-label">Nombre de Usuario</label>
+                    <input type="text" class="form-input" placeholder="Tu nombre">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-input" placeholder="ejemplo@correo.com">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Contraseña</label>
-                    <input type="password" class="form-input" placeholder="Contraseña">
-                </div>
-
-                <div class="form-extras">
-                    <div class="checkbox-group">
-                        <input type="checkbox" class="checkbox-input" id="rememberMe">
-                        <label for="Mantener sesion iniciada">Mantener sesion iniciada.</label>
-                    </div>
-                    <a href="#" class="Olvide mi contraseña">Olvide mi contraseña</a>
-                </div>
-
-                <button class="auth-button">Iniciar Sesion</button>
-            </div>
-
-            <div class="auth-column register-form">
-                <h2 class="auth-title">Registrarse</h2>
-
-                <div class="form-group">
-                    <label class="form-label">Nombre</label>
-                    <input type="text" class="form-input" placeholder="Nombre">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Correo Electronico</label>
-                    <input type="email" class="form-input" placeholder="Correo Electronico">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Contraseña</label>
-                    <input type="password" class="form-input" placeholder="Contraseña">
+                    <input type="password" class="form-input" placeholder="Mínimo 8 caracteres">
                 </div>
 
                 <div class="form-group checkbox-group">
                     <input type="checkbox" class="checkbox-input" id="acceptTerms">
-                    <label for="acceptTerms">Acepto los terminos y condiciones</label>
+                    <label for="acceptTerms" class="checkbox-label">Acepto los términos y condiciones</label>
                 </div>
 
                 <button class="auth-button">Registrarse</button>
 
+                <div class="already-account">
+                    ¿Ya tienes una cuenta? 
+                    <button id="toggleLogin" class="text-button">Iniciar Sesión</button>
+                </div>
             </div>
 
+            <div class="auth-column" id="loginView" style="display: none;">
+                <h2 class="auth-title">Iniciar Sesión</h2>
+                <div class="form-group">
+                    <label class="form-label">Correo o Usuario</label>
+                    <input type="text" class="form-input" placeholder="Usuario/Email">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" class="form-input" placeholder="Tu contraseña">
+                </div>
+                <button class="auth-button">Entrar</button>
+                <div class="already-account">
+                    ¿No tienes cuenta? 
+                    <button id="toggleRegister" class="text-button">Registrarse</button>
+                </div>
+            </div>
         </div>
     </div>
 
+    <footer style="background: #2F2A26; color: white; padding: 20px 0; text-align: center; width: 100%;">
+        <div class="container">
+            <p>&copy; 2026 BAJAR - Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
     <script>
-        // Obtenemos las referencias de los elementos
-        const userBtn = document.getElementById('userBtn');
         const authInterface = document.getElementById('authInterface');
+        const registerView = document.getElementById('registerView');
+        const loginView = document.getElementById('loginView');
+        const userBtn = document.getElementById('userBtn'); 
         const closeAuth = document.getElementById('closeAuth');
+        const btnIrALogin = document.getElementById('toggleLogin');
+        const btnIrARegistro = document.getElementById('toggleRegister');
 
-        // Función para abrir la interfaz
-        userBtn.addEventListener('click', () => {
+        userBtn.onclick = () => {
             authInterface.classList.add('is-visible');
-            // Evitamos que la página principal haga scroll detrás
-            document.body.style.overflow = 'hidden'; 
-        });
+        };
 
-        // Función para cerrar la interfaz
-        function closeInterface() {
+        closeAuth.onclick = () => {
             authInterface.classList.remove('is-visible');
-            // Devolvemos el scroll a la página principal
-            document.body.style.overflow = ''; 
-        }
+        };
 
-        // Clic en la 'X' para cerrar
-        closeAuth.addEventListener('click', closeInterface);
+        btnIrALogin.onclick = () => {
+            registerView.style.display = 'none';
+            loginView.style.display = 'flex';
+        };
 
-        // Clic fuera del contenedor para cerrar
-        authInterface.addEventListener('click', (e) => {
-            // Si el clic fue en el fondo (el contenedor principal), no en el contenido central
-            if (e.target === authInterface) {
-                closeInterface();
+        btnIrARegistro.onclick = () => {
+            loginView.style.display = 'none';
+            registerView.style.display = 'flex';
+        };
+
+        window.onclick = (event) => {
+            if (event.target == authInterface) {
+                authInterface.classList.remove('is-visible');
             }
-        });
-
-        // Opcional: Cerrar con la tecla 'Esc'
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && authInterface.classList.contains('is-visible')) {
-                closeInterface();
-            }
-        });
+        };
     </script>
+
 
 </body>
 </html>

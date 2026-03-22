@@ -5,7 +5,7 @@ const app = express();
 // Servir archivos estáticos (CSS, Imágenes, JS del navegador)
 app.use(express.static(path.join(__dirname, '/')));
 
-// Ruta para mostrar tu página principal
+// Ruta para mostrar tu página principal al entrar al link de Render
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -15,3 +15,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor activo en puerto ${PORT}`);
 });
+

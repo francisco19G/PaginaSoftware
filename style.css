@@ -1,3 +1,51 @@
+/* --- AJUSTE DE PANTALLA COMPLETA --- */
+html, body {
+    height: 100%; /* Obliga al navegador a usar el 100% del alto */
+    margin: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--color-text-dark);
+    background-color: #fff;
+    line-height: 1.6;
+
+    /* Activamos Flexbox en el body para controlar el alto */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Asegura que al menos ocupe el alto de la pantalla */
+}
+
+/* El Header se queda arriba */
+.main-header {
+    flex-shrink: 0;
+    max-width: 100% !important; /* Rompe el límite de 1200px */
+    width: 100%;
+    padding: 0 40px; /* Espacio elegante a los lados en pantallas anchas */
+}
+
+/* LA MAGIA: El contenido principal se estira */
+.main-content {
+    flex: 1; /* Esto empuja el footer al fondo de la pantalla */
+    display: flex;
+    flex-direction: column;
+}
+
+/* El contenedor ahora ocupa todo el ancho disponible */
+.container {
+    width: 100%;
+    max-width: 100%; /* Cambiamos 1200px por 100% para pantalla completa */
+    padding: 0 40px; /* Un poco de margen a los lados */
+    margin: 0 auto;
+    
+}
+
+/* El footer se queda siempre abajo */
+footer {
+    flex-shrink: 0;
+    width: 100%;
+}
+
 /* -----------------------------------------------------------
    ESTILOS GENERALES Y VARIABLES DE COLOR (Basadas en tu imagen)
 ----------------------------------------------------------- */
@@ -36,6 +84,12 @@ a {
     color: inherit; /* Hereda el color del texto del padre */
     cursor: pointer;
 }
+/* Asegura que las columnas se comporten bien al aparecer */
+.auth-column {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
 
 /* Estilo para las flechas hacia abajo de los dropdowns */
 .arrow-down {
@@ -50,6 +104,7 @@ a {
 .middle-bar {
     background-color: var(--color-bg-light); /* Fondo crema claro de la paleta */
     padding: 15px 0;
+    width: 100%;
 }
 
 .middle-bar-content {
@@ -114,6 +169,10 @@ a {
     border-radius: 4px;
     overflow: hidden; /* Para que el botón y dropdown respeten el border-radius */
     height: 45px;
+    max-width: 700px; /* Limita la barra de búsqueda para que no sea infinita */
+    margin: 0 auto;   /* La centra si hay mucho espacio */
+    flex-grow: 1;
+
 }
 
 .categories-dropdown {
@@ -199,6 +258,7 @@ a {
 .navigation-bar {
     background-color: var(--color-accent-green); /* Verde oliva de la paleta */
     color: #fff;
+    width: 100%;
 }
 
 .navigation-bar-content {
@@ -236,172 +296,214 @@ a {
 .phone-icon {
     font-size: 1.1rem;
 }
-/* Contenedor principal que cubre toda la pantalla */
+/* --- CONFIGURACIÓN GENERAL Y VARIABLES --- */
+:root {
+    /* Paleta de colores moderna y suave */
+    --bg-main: #f4f7f6; /* Gris muy claro para el fondo */
+    --bg-panel: #ffffff; /* Blanco puro para el formulario */
+    --color-primary: #2c3e50; /* Azul oscuro para textos principales */
+    --color-secondary: #7f8c8d; /* Gris para textos secundarios */
+    --color-accent: #e67e22; /* Naranja zanahoria para botones y acentos */
+    --color-accent-hover: #d35400; /* Naranja más oscuro para el hover */
+    --color-border: #dcdde1; /* Gris claro para bordes de inputs */
+    
+    /* Sombras y bordes */
+    --shadow-panel: 0 15px 35px rgba(0,0,0,0.1);
+    --shadow-input: 0 2px 5px rgba(0,0,0,0.03);
+    --border-radius: 12px;
+    --input-radius: 8px;
+    
+    /* Tipografía */
+    --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-main);
+    color: var(--color-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* --- CONTENEDOR PRINCIPAL DE LA INTERFAZ --- */
 .auth-interface {
-    position: fixed; /* Fijo sobre todo lo demás */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.95); /* Fondo blanco con ligera transparencia */
-    z-index: 1000; /* Asegura que esté encima de todo */
-    overflow-y: auto; /* Permite scroll si el contenido es muy largo */
-    padding-top: 50px; /* Espacio para que no toque el borde superior */
-    transition: all 0.3s ease; /* Transición suave */
-    
-    /* Por defecto, está oculta */
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-/* Clase para mostrar la interfaz */
 .auth-interface.is-visible {
     opacity: 1;
     visibility: visible;
-    pointer-events: auto;
 }
 
-/* Contenedor central de las dos columnas */
-.auth-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px;
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
-    gap: 60px; /* Espacio entre columnas */
+/* --- EL PANEL DEL FORMULARIO --- */
+.auth-container.single-column {
+    background-color: var(--bg-panel);
+    width: 100%;
+    max-width: 420px; /* Ancho óptimo y elegante */
+    padding: 50px 40px; /* Mucho espaciado interno (padding) */
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-panel);
+    position: relative;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
 }
 
-/* Estilos comunes para las columnas */
+.auth-interface.is-visible .auth-container.single-column {
+    transform: translateY(0);
+}
+
+/* Botón de cerrar (X) */
+.close-auth {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 1.5rem;
+    color: var(--color-secondary);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    line-height: 1;
+}
+
+.close-auth:hover {
+    color: var(--color-primary);
+}
+
+/* --- ELEMENTOS DEL FORMULARIO --- */
 .auth-column {
     display: flex;
     flex-direction: column;
+    gap: 20px; /* Espacio uniforme entre elementos */
 }
 
-/* Títulos h2 */
 .auth-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 25px;
-    color: #333;
+    text-align: center;
+    margin-bottom: 15px;
+    color: var(--color-primary);
+    letter-spacing: -0.5px;
 }
 
-/* Etiquetas de formulario */
 .form-group {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Espacio entre label e input */
 }
 
 .form-label {
-    font-size: 0.95rem;
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: #555;
-    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-left: 2px;
 }
 
-/* Campos de entrada */
 .form-input {
     width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #dcdcdc;
-    border-radius: 4px;
+    padding: 15px; /* Inputs más altos y cómodos */
     font-size: 1rem;
-    color: #333;
-}
-
-.form-input::placeholder {
-    color: #a0a0a0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--input-radius);
+    background-color: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    color: var(--color-primary);
 }
 
 .form-input:focus {
     outline: none;
-    border-color: var(--color-accent-green);
-    box-shadow: 0 0 0 2px rgba(112, 122, 94, 0.1);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1); /* Efecto de foco suave */
 }
 
-/* Checkboxes y enlaces extra */
-.form-extras {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 25px;
-}
-
+/* Estilo para el Checkbox y términos */
 .checkbox-group {
-    display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
 }
 
 .checkbox-input {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--color-accent-green); /* Usa el color verde oliva */
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--color-accent); /* Color del check moderno */
 }
 
-.forgot-password {
-    color: #2F2A26;
-    text-decoration: underline;
-    opacity: 0.8;
+.checkbox-label {
+    font-size: 0.9rem;
+    color: var(--color-secondary);
+    cursor: pointer;
 }
 
-.forgot-password:hover {
-    opacity: 1;
-}
-
-/* Botones de Login y Register */
+/* --- BOTONES --- */
 .auth-button {
     width: 100%;
-    background-color: var(--color-accent-green); /* Verde oliva de la paleta */
-    color: #fff;
-    border: none;
-    padding: 15px;
-    border-radius: 4px;
+    padding: 16px;
     font-size: 1.1rem;
-    font-weight: 500;
+    font-weight: 600;
+    color: #fff;
+    background-color: var(--color-accent);
+    border: none;
+    border-radius: var(--input-radius);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    margin-top: 10px;
 }
 
 .auth-button:hover {
-    background-color: #5c654e; /* Un tono más oscuro para el hover */
+    background-color: var(--color-accent-hover);
 }
 
-/* Texto de "Already have an account?" */
+.auth-button:active {
+    transform: scale(0.98); /* Efecto de pulsación */
+}
+
+/* Sección inferior "Ya tienes cuenta?" */
 .already-account {
     text-align: center;
-    font-size: 0.9rem;
-    color: #666;
     margin-top: 25px;
+    font-size: 0.95rem;
+    color: var(--color-secondary);
+    border-top: 1px solid #eee; /* Línea divisoria sutil */
+    padding-top: 20px;
 }
 
-.login-link {
-    color: var(--color-primary-terracotta); /* Terracota de la paleta */
+/* Botón de texto sutil para cambiar de formulario */
+.text-button {
+    background: none;
+    border: none;
+    color: var(--color-accent);
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 0;
+    margin-left: 5px;
+    transition: color 0.2s ease;
+}
+
+.text-button:hover {
+    color: var(--color-accent-hover);
     text-decoration: underline;
-    cursor: pointer;
-}
-
-/* Botón de cierre (para que el usuario pueda salir) */
-.close-auth {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 2rem;
-    color: #a0a0a0;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-.close-auth:hover {
-    color: #333;
-}
-
-/* Media Query para móviles (apilar columnas) */
-@media (max-width: 768px) {
-    .auth-container {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
 }
