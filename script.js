@@ -43,11 +43,11 @@ transporter.verify((error) => {
     else console.log("✅ Cartero listo para enviar correos");
 });
 
-// --- RUTA: REGISTRO + ENVÍO DE CÓDIGO ---
 app.post('/register', (req, res) => {
     const { nombre, correo, password } = req.body;
-    const codigo = Math.floor(100000 + Math.random() * 900000); // 6 dígitos
+    const codigo = Math.floor(100000 + Math.random() * 900000);
 
+    // 1. Guardar en la DB (Asegúrate que los nombres coincidan con Railway)
     const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol, codigo_verificacion) VALUES (?, ?, ?, 'usuario', ?)";
     
     db.query(sql, [nombre, correo, password, codigo], (err, result) => {
@@ -56,28 +56,26 @@ app.post('/register', (req, res) => {
             return res.status(500).json({ error: "Error en base de datos: " + err.sqlMessage });
         }
 
+        // 2. Intentar enviar el correo
         const mailOptions = {
             from: `"BAJAR Tienda" <${process.env.EMAIL_USER}>`,
             to: correo,
             subject: 'Tu código de verificación - BAJAR',
-            html: `
-                <div style="font-family: sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
-                    <h2 style="color: #2F2A26;">¡Bienvenido a BAJAR, ${nombre}!</h2>
-                    <p>Usa el siguiente código para verificar tu cuenta:</p>
-                    <h1 style="background: #f4f4f4; padding: 10px; text-align: center; letter-spacing: 5px;">${codigo}</h1>
-                    <p>Si no solicitaste esto, ignora este correo.</p>
-                </div>`
+            html: `<h3>Hola ${nombre}, tu código es: <b>${codigo}</b></h3>`
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.error("❌ Falló el envío de correo:", error.message);
+                // Si el correo falla, avisamos pero confirmamos que el usuario se creó
+                console.error("❌ Error Nodemailer:", error.message);
                 return res.json({ 
+                    success: true, 
                     message: "Usuario creado, pero hubo un error enviando el correo.",
                     debug: error.message 
                 });
             }
-            res.json({ message: "Código enviado a tu correo" });
+            console.log("✅ Correo enviado a:", correo);
+            res.json({ success: true, message: "Código enviado a tu correo" });
         });
     });
 });
