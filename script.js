@@ -94,10 +94,12 @@ const nodemailer = require('nodemailer');
 
 // 1. Configurar el transporte de correo (Usa variables de entorno en Render)
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // true para puerto 465
     auth: {
-        user: process.env.EMAIL_USER, // Tu correo
-        pass: process.env.EMAIL_PASS  // Tu "Contraseña de aplicación" de Google
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 });
 
