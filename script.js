@@ -17,7 +17,7 @@ app.post('/register', (req, res) => {
     // Definimos el rol como 'usuario' por defecto en el código
     const rolPorDefecto = 'usuario';
 
-    const sql = "INSERT INTO usuarios (Nombre, Correo, Contrasena, Rol) VALUES (?, ?, ?, ?)";
+    const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol) VALUES (?, ?, ?, ?)";
     
     db.query(sql, [nombre, correo, password, rolPorDefecto], (err, result) => {
         if (err) {
