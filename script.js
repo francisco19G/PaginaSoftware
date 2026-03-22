@@ -8,19 +8,16 @@ app.use(express.json()); // Para poder leer datos JSON enviados desde el formula
 app.use(express.static(path.join(__dirname, '/')));
 
 
-// En tu script.js
-const mysql = require('mysql2');
 
-// Crear el pool de conexión usando la URL pública de la variable de entorno
+// Solo una vez
 const db = mysql.createPool(process.env.DATABASE_URL);
 
-// Prueba la conexión inmediatamente para ver si hay errores en el log
-db.getConnection((err, connection) => {
-    if (err) {
-        console.error("Fallo total de conexión a Railway:", err.message);
-    } else {
-        console.log("¡Conectado exitosamente a Railway vía URL Pública!");
-        connection.release();
+// Verificar conexión
+db.getConnection((err, conn) => {
+    if (err) console.error("Error conexión:", err.message);
+    else {
+        console.log("¡Conectado a Railway!");
+        conn.release();
     }
 });
 // RUTA PARA REGISTRAR USUARIOS
