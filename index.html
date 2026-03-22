@@ -128,42 +128,64 @@
             <p>&copy; 2026 BAJAR - Todos los derechos reservados.</p>
         </div>
     </footer>
-<input type="text" id="regNombre" class="form-input" ...>
-<input type="email" id="regCorreo" class="form-input" ...>
-<input type="password" id="regPass" class="form-input" ...>
-   <script>
-    // Seleccionamos el botón de registro
-    const btnRegistrar = document.querySelector('#registerView .auth-button');
+<input type="text" id="regNombre" class="form-input" placeholder="Tu nombre">
 
-    if (btnRegistrar) {
-        btnRegistrar.onclick = async function(e) {
-            e.preventDefault(); // Evita que la página se recargue
-            console.log("¡Clic detectado en el botón de registro!");
+<input type="email" id="regCorreo" class="form-input" placeholder="ejemplo@correo.com">
 
-            const nombre = document.getElementById('regNombre').value;
-            const correo = document.getElementById('regCorreo').value;
-            const password = document.getElementById('regPass').value;
+<input type="password" id="regPass" class="form-input" placeholder="Contraseña">
+<script>
+    // Usamos una función que espera a que toda la página cargue
+    window.addEventListener('load', () => {
+        console.log("Página cargada. Buscando botón...");
 
-            console.log("Enviando:", { nombre, correo, password });
+        // Buscamos el botón por su texto para no fallar con las clases
+        const botones = document.querySelectorAll('.auth-button');
+        let btnRegistrar = null;
 
-            try {
-                const respuesta = await fetch('/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre, correo, password })
-                });
-
-                const resultado = await respuesta.json();
-                alert(resultado.message || resultado.error);
-                
-            } catch (error) {
-                console.error("Error al enviar:", error);
-                alert("No se pudo conectar con el servidor.");
+        botones.forEach(boton => {
+            if(boton.innerText.includes("Registrarse")) {
+                btnRegistrar = boton;
             }
-        };
-    } else {
-        console.error("No se encontró el botón de registro. Revisa el selector CSS.");
-    }
+        });
+
+        if (btnRegistrar) {
+            console.log("¡Botón de registro encontrado!");
+            
+            btnRegistrar.addEventListener('click', async (e) => {
+                e.preventDefault();
+                console.log("Clic detectado. Leyendo inputs...");
+
+                const nombre = document.getElementById('regNombre')?.value;
+                const correo = document.getElementById('regCorreo')?.value;
+                const password = document.getElementById('regPass')?.value;
+
+                if(!nombre || !correo || !password) {
+                    alert("Por favor, llena todos los campos con los ID correctos");
+                    console.log("Faltan datos:", {nombre, correo, password});
+                    return;
+                }
+
+                try {
+                    console.log("Enviando petición al servidor...");
+                    const respuesta = await fetch('/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nombre, correo, password })
+                    });
+
+                    const resultado = await respuesta.json();
+                    console.log("Respuesta del servidor:", resultado);
+                    alert(resultado.message || resultado.error);
+
+                } catch (err) {
+                    console.error("Error en la petición fetch:", err);
+                    alert("Error de conexión con el servidor");
+                }
+            });
+        } else {
+            console.error("ERROR: No se encontró ningún botón que diga 'Registrarse'");
+        }
+    });
 </script>
 
 </body>
