@@ -20,6 +20,7 @@
   "homepage": "https://github.com/francisco19G/PaginaSoftware#readme",
   "dependencies": {
     "express": "^5.2.1",
-    "mysql2": "^3.20.0"
+    "mysql2": "^3.20.0",
+    "nodemailer": "^8.0.3"
   }
 }
