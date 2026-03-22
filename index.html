@@ -193,7 +193,7 @@
                 alert("No se pudo conectar con el servidor.");
             }
         };
-// Primero, asegúrate de tener los ID en el HTML: loginUser y loginPass
+// --- LÓGICA DE LOGIN ---
 const btnEntrar = document.querySelector('#loginView .auth-button');
 
 btnEntrar.onclick = async () => {
@@ -201,7 +201,7 @@ btnEntrar.onclick = async () => {
     const password = document.getElementById('loginPass').value;
 
     if (!correo || !password) {
-        alert("Por favor, ingresa tus credenciales.");
+        alert("Por favor, ingresa tu correo y contraseña.");
         return;
     }
 
@@ -215,17 +215,27 @@ btnEntrar.onclick = async () => {
         const datos = await respuesta.json();
 
         if (respuesta.ok) {
-            alert(`¡Hola ${datos.user.nombre}! Has iniciado sesión.`);
-            // Aquí puedes redirigir o cerrar el modal
+            alert(`¡Bienvenido de nuevo, ${datos.user.nombre}!`);
+            
+            // 1. Ocultamos el modal
             authInterface.classList.remove('is-visible');
-            // Cambiamos el icono de usuario por el nombre (opcional)
-            userBtn.innerHTML = `<span>${datos.user.nombre}</span>`;
+
+            // 2. Cambiamos el icono de usuario por el nombre en el header
+            document.getElementById('userBtn').innerHTML = `
+                <span style="font-size: 14px; font-weight: bold; color: #2F2A26;">
+                    Hola, ${datos.user.nombre}
+                </span>`;
+            
+            // 3. Opcional: Guardar sesión básica en el navegador
+            localStorage.setItem('usuarioNombre', datos.user.nombre);
+
         } else {
+            // Si el servidor responde 401 (Incorrecto) o 500
             alert("Error: " + datos.error);
         }
     } catch (error) {
-        console.error("Error en login:", error);
-        alert("No se pudo conectar con el servidor.");
+        console.error("Error en la conexión de login:", error);
+        alert("No se pudo conectar con el servidor para iniciar sesión.");
     }
 };
     </script>
