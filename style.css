@@ -515,3 +515,47 @@ body {
     color: var(--color-accent-hover);
     text-decoration: underline;
 }
+/* Contenedor principal de la cuadrícula */
+.products-grid {
+    display: grid;
+    /* Esto obliga a tener 2 columnas fijas en pantallas medianas/grandes */
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 30px;
+    padding: 40px 0;
+    max-width: 1000px; /* Evita que las tarjetas se estiren demasiado */
+    margin: 0 auto;    /* Centra toda la cuadrícula */
+}
+
+/* Tarjeta de Producto */
+.product-card {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    text-align: left; /* Alinea el texto a la izquierda como en la imagen */
+}
+
+/* Contenedor de la imagen */
+.product-image {
+    position: relative;
+    background-color: #f1f1f1; /* Gris claro de fondo */
+    aspect-ratio: 1 / 1;       /* Hace que el cuadro de la imagen sea cuadrado */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.product-image img {
+    width: 80%; /* Ajusta el tamaño de la imagen dentro del cuadro gris */
+    height: auto;
+    object-fit: contain;
+}
+
+/* Ajuste para móviles (1 sola columna si la pantalla es muy pequeña) */
+@media (max-width: 600px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+}
