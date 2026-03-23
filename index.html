@@ -167,15 +167,21 @@
         <p>&copy; 2026 Valor Noble - Todos los derechos reservados.</p>
     </footer>
 
-    <script>
-        // SELECTORES
+<script>
+        // SELECTORES ORGANIZADOS
         const views = {
-            store: document.getElementById('mainStoreView'),
-            detail: document.getElementById('productDetailView'),
-            profile: document.getElementById('userProfileView'),
-            auth: document.getElementById('authInterface'),
-            cart: document.getElementById('cartSidebar'),
-            menu: document.getElementById('sideMenu')
+            // Vistas principales (se intercambian)
+            main: {
+                store: document.getElementById('mainStoreView'),
+                detail: document.getElementById('productDetailView'),
+                profile: document.getElementById('userProfileView')
+            },
+            // Paneles flotantes (no se deben ocultar con display:none)
+            panels: {
+                auth: document.getElementById('authInterface'),
+                cart: document.getElementById('cartSidebar'),
+                menu: document.getElementById('sideMenu')
+            }
         };
 
         const overlays = {
@@ -183,24 +189,33 @@
             menu: document.getElementById('menuOverlay')
         };
 
-        // NAVEGACIÓN ENTRE VISTAS
+        // NAVEGACIÓN ENTRE VISTAS (CORREGIDA)
         const showView = (viewName) => {
-            Object.values(views).forEach(v => v.style.display = 'none');
-            views[viewName].style.display = 'block';
-            views.auth.classList.remove('is-visible');
+            // Solo ocultamos las vistas principales del contenido
+            Object.values(views.main).forEach(v => {
+                if(v) v.style.display = 'none';
+            });
+            
+            // Mostramos la vista solicitada
+            if(views.main[viewName]) {
+                views.main[viewName].style.display = 'block';
+            }
+
+            // Cerramos el modal de login si estaba abierto
+            views.panels.auth.classList.remove('is-visible');
             window.scrollTo(0,0);
         };
 
         // LÓGICA MENÚ LATERAL
         document.querySelector('.hamburger-menu').onclick = () => {
-            views.menu.classList.add('active');
+            views.panels.menu.classList.add('active');
             overlays.menu.classList.add('show');
         };
 
         const closeSidePanels = () => {
-            views.menu.classList.remove('active');
+            views.panels.menu.classList.remove('active');
             overlays.menu.classList.remove('show');
-            views.cart.classList.remove('open');
+            views.panels.cart.classList.remove('open');
             overlays.cart.classList.remove('show');
         };
 
@@ -221,7 +236,7 @@
 
         // LÓGICA CARRITO
         document.getElementById('openCartBtn').onclick = () => {
-            views.cart.classList.add('open');
+            views.panels.cart.classList.add('open');
             overlays.cart.classList.add('show');
         };
         document.getElementById('closeCart').onclick = closeSidePanels;
@@ -233,7 +248,7 @@
             if (label.includes('Hola')) {
                 abrirPerfil(e);
             } else {
-                views.auth.classList.add('is-visible');
+                views.panels.auth.classList.add('is-visible');
             }
         };
 
@@ -284,7 +299,7 @@
                 if(res.ok) {
                     document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
                     document.getElementById('profileCorreo').value = correo;
-                    views.auth.classList.remove('is-visible');
+                    views.panels.auth.classList.remove('is-visible');
                 } else { alert(data.error); }
             } catch(e) { alert("Error"); }
         };
@@ -298,7 +313,7 @@
             document.getElementById('loginView').style.display = 'none';
             document.getElementById('registerView').style.display = 'flex';
         };
-        document.getElementById('closeAuth').onclick = () => views.auth.classList.remove('is-visible');
+        document.getElementById('closeAuth').onclick = () => views.panels.auth.classList.remove('is-visible');
     </script>
 </body>
 </html>
