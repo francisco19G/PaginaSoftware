@@ -29,15 +29,10 @@
             <span id="closeCart" class="close-cart-btn">&times;</span>
         </div>
         <div id="cartItemsContainer" class="cart-items">
-            <div class="cart-empty-msg" style="text-align: center; margin-top: 50px; color: #888;">
-                Tu carrito está vacío.
-            </div>
+            <div class="cart-empty-msg" style="text-align: center; margin-top: 50px; color: #888;">Tu carrito está vacío.</div>
         </div>
         <div class="cart-footer">
-            <div class="cart-total">
-                <span>Total:</span>
-                <span id="cartTotalPrice">$0.00</span>
-            </div>
+            <div class="cart-total"><span>Total:</span> <span id="cartTotalPrice">$0.00</span></div>
             <button class="checkout-btn">Finalizar Compra</button>
             <button id="clearCart" class="clear-btn">Vaciar Carrito</button>
         </div>
@@ -52,15 +47,11 @@
                     <span class="logo-text">Valor Noble</span>
                 </div>
                 <div class="hamburger-menu" style="cursor: pointer;">&#9776;</div>
-                
                 <div class="search-bar">
-                    <div class="categories-dropdown">
-                        Todas las Categorias <span class="arrow-down">&#9662;</span>
-                    </div>
+                    <div class="categories-dropdown">Todas las Categorias <span class="arrow-down">&#9662;</span></div>
                     <input type="text" placeholder="Buscar">
                     <button class="search-button">&#128269;</button>
                 </div>
-
                 <div class="user-actions">
                     <div class="icon-badge"> &#9825; <span class="badge">0</span> </div>
                     <div class="icon-badge" id="openCartBtn" style="cursor: pointer;"> 
@@ -78,7 +69,6 @@
                 <h2 class="section-title">Nuestros Productos</h2>
                 <div class="title-underline"></div>
             </div>
-
             <div class="products-grid">
                 <div class="product-card" style="cursor: pointer;">
                     <div class="product-image">
@@ -87,12 +77,9 @@
                     </div>
                     <div class="product-info">
                         <h3 class="product-name">Imagen prueba 1</h3>
-                        <div class="product-price">
-                            <span class="price-current">$120.32</span>
-                        </div>
+                        <div class="product-price"><span class="price-current">$120.32</span></div>
                     </div>
                 </div>
-
                 <div class="product-card" style="cursor: pointer;">
                     <div class="product-image">
                         <span class="badge badge-new">NEW</span>
@@ -101,9 +88,7 @@
                     </div>
                     <div class="product-info">
                         <h3 class="product-name">Imagen prueba 2</h3>
-                        <div class="product-price">
-                            <span class="price-current">$65.86</span>
-                        </div>
+                        <div class="product-price"><span class="price-current">$65.86</span></div>
                     </div>
                 </div>
             </div>
@@ -120,13 +105,39 @@
                     </div>
                 </div>
                 <div style="flex: 1; min-width: 300px;">
-                    <h1 id="detailTitle" style="font-size: 2rem; margin-bottom: 10px;">Nombre del Producto</h1>
-                    <div style="margin-bottom: 20px;">
-                        <span id="detailPrice" style="font-size: 1.5rem; color: #ff5722; font-weight: bold;">$0.00</span>
-                    </div>
-                    <p style="color: #666; line-height: 1.6; margin-bottom: 30px;">Descripción detallada de la artesanía seleccionada.</p>
+                    <h1 id="detailTitle" style="font-size: 2rem; margin-bottom: 10px;">Nombre</h1>
+                    <div style="margin-bottom: 20px;"><span id="detailPrice" style="font-size: 1.5rem; color: #ff5722; font-weight: bold;">$0.00</span></div>
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 30px;">Descripción artesanal seleccionada.</p>
                     <button class="add-to-cart-btn" style="background: #8c9b8c; color: white; border: none; padding: 12px 40px; font-weight: bold; cursor: pointer; width: 100%;">Añadir al Carrito</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="userProfileView" class="user-profile-container" style="display: none; padding: 50px 0;">
+        <div class="container">
+            <button id="btnBackFromProfile" style="margin-bottom: 20px; cursor: pointer; background: none; border: 1px solid #ddd; padding: 5px 15px;">← Volver a la tienda</button>
+            <div class="profile-card" style="max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                <h2 style="margin-bottom: 25px; color: #2F2A26; border-bottom: 2px solid #8c9b8c; padding-bottom: 10px;">Mi Perfil</h2>
+                <form id="profileForm">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre Completo</label>
+                        <input type="text" id="profileNombre" class="form-input" placeholder="Tu nombre">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Correo Electrónico</label>
+                        <input type="email" id="profileCorreo" class="form-input" readonly style="background: #f9f9f9; cursor: not-allowed;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Teléfono</label>
+                        <input type="tel" id="profileTelefono" class="form-input" placeholder="Ej: 5512345678">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Dirección de Envío</label>
+                        <textarea id="profileDireccion" class="form-input" style="height: 80px; padding: 10px;" placeholder="Calle, número, colonia..."></textarea>
+                    </div>
+                    <button type="submit" class="auth-button" style="background: #2F2A26; width: 100%;">Guardar Cambios</button>
+                </form>
             </div>
         </div>
     </div>
@@ -136,152 +147,116 @@
             <div id="closeAuth" class="close-auth">&#10006;</div>
             <div class="auth-column" id="registerView">
                 <h2 class="auth-title">Crear Cuenta</h2>
-                <div class="form-group"><input type="text" id="regNombre" class="form-input" placeholder="Tu nombre"></div>
+                <div class="form-group"><input type="text" id="regNombre" class="form-input" placeholder="Nombre"></div>
                 <div class="form-group"><input type="email" id="regCorreo" class="form-input" placeholder="Correo"></div>
                 <div class="form-group"><input type="password" id="regPass" class="form-input" placeholder="Contraseña"></div>
                 <button class="auth-button" id="btnRegistrarFinal">Registrarse</button>
-                <div class="already-account">¿Ya tienes cuenta? <button id="toggleLogin" class="text-button">Iniciar Sesión</button></div>
+                <div class="already-account">¿Ya tienes cuenta? <button id="toggleLogin" class="text-button">Login</button></div>
             </div>
             <div class="auth-column" id="loginView" style="display: none;">
                 <h2 class="auth-title">Iniciar Sesión</h2>
                 <div class="form-group"><input type="text" id="loginUser" class="form-input" placeholder="Correo"></div>
                 <div class="form-group"><input type="password" id="loginPass" class="form-input" placeholder="Contraseña"></div>
                 <button class="auth-button" id="btnEntrarLogin">Entrar</button>
-                <div class="already-account">¿No tienes cuenta? <button id="toggleRegister" class="text-button">Registrarse</button></div>
+                <div class="already-account">¿No tienes cuenta? <button id="toggleRegister" class="text-button">Registro</button></div>
             </div>
         </div>
     </div>
-<div id="userProfileView" class="user-profile-container" style="display: none; padding: 50px 0;">
-    <div class="container">
-        <button id="btnBackFromProfile" style="margin-bottom: 20px; cursor: pointer; background: none; border: 1px solid #ddd; padding: 5px 15px;">← Volver a la tienda</button>
-        
-        <div class="profile-card" style="max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-            <h2 style="margin-bottom: 25px; color: #2F2A26; border-bottom: 2px solid #8c9b8c; padding-bottom: 10px;">Mi Perfil</h2>
-            
-            <form id="profileForm">
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre Completo</label>
-                    <input type="text" id="profileNombre" class="form-input" placeholder="Tu nombre">
-                </div>
-                
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Correo Electrónico</label>
-                    <input type="email" id="profileCorreo" class="form-input" readonly style="background: #f9f9f9; cursor: not-allowed;">
-                    <small style="color: #888;">El correo no se puede cambiar.</small>
-                </div>
 
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Teléfono</label>
-                    <input type="tel" id="profileTelefono" class="form-input" placeholder="Ej: 5512345678">
-                </div>
-
-                <div class="form-group" style="margin-bottom: 25px;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Dirección de Envío</label>
-                    <textarea id="profileDireccion" class="form-input" style="height: 80px; padding: 10px;" placeholder="Calle, número, colonia y CP"></textarea>
-                </div>
-
-                <button type="submit" class="auth-button" style="background: #2F2A26; width: 100%;">Guardar Cambios</button>
-            </form>
-        </div>
-    </div>
-</div>
     <footer style="background: #2F2A26; color: white; padding: 20px 0; text-align: center;">
         <p>&copy; 2026 Valor Noble - Todos los derechos reservados.</p>
     </footer>
 
     <script>
-        // --- SELECTORES ---
-        const mainStoreView = document.getElementById('mainStoreView');
-        const productDetailView = document.getElementById('productDetailView');
-        const authInterface = document.getElementById('authInterface');
-        const cartSidebar = document.getElementById('cartSidebar');
-        const cartOverlay = document.getElementById('cartOverlay');
-        const sideMenu = document.getElementById('sideMenu');
-        const menuOverlay = document.getElementById('menuOverlay');
-
-        // --- LÓGICA MENÚ IZQUIERDO (HAMBURGUESA) ---
-        const hamburgerBtn = document.querySelector('.hamburger-menu');
-        const closeMenuBtn = document.getElementById('closeMenu');
-
-        const toggleMenu = (open) => {
-            sideMenu.classList.toggle('active', open);
-            menuOverlay.classList.toggle('show', open);
+        // SELECTORES
+        const views = {
+            store: document.getElementById('mainStoreView'),
+            detail: document.getElementById('productDetailView'),
+            profile: document.getElementById('userProfileView'),
+            auth: document.getElementById('authInterface'),
+            cart: document.getElementById('cartSidebar'),
+            menu: document.getElementById('sideMenu')
         };
 
-        hamburgerBtn.onclick = () => toggleMenu(true);
-        closeMenuBtn.onclick = () => toggleMenu(false);
-        menuOverlay.onclick = () => toggleMenu(false);
-
-        document.getElementById('menuMyAccount').onclick = (e) => {
-            e.preventDefault();
-            toggleMenu(false);
-            authInterface.classList.add('is-visible');
+        const overlays = {
+            cart: document.getElementById('cartOverlay'),
+            menu: document.getElementById('menuOverlay')
         };
 
-        // --- LÓGICA CARRITO DERECHO ---
-        const openCartBtn = document.getElementById('openCartBtn');
-        const closeCartBtn = document.getElementById('closeCart');
-
-        const toggleCart = (show) => {
-            cartSidebar.classList.toggle('open', show);
-            cartOverlay.classList.toggle('show', show);
+        // NAVEGACIÓN ENTRE VISTAS
+        const showView = (viewName) => {
+            Object.values(views).forEach(v => v.style.display = 'none');
+            views[viewName].style.display = 'block';
+            views.auth.classList.remove('is-visible');
+            window.scrollTo(0,0);
         };
 
-        openCartBtn.onclick = () => toggleCart(true);
-        closeCartBtn.onclick = () => toggleCart(false);
-        cartOverlay.onclick = () => toggleCart(false);
+        // LÓGICA MENÚ LATERAL
+        document.querySelector('.hamburger-menu').onclick = () => {
+            views.menu.classList.add('active');
+            overlays.menu.classList.add('show');
+        };
 
-        // Añadir al carrito
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('add-to-cart-btn')) {
-                const badge = document.getElementById('mainCartBadge');
-                const label = document.getElementById('cartCountLabel');
-                let count = parseInt(badge.innerText) + 1;
-                badge.innerText = count;
-                label.innerText = count;
-                alert("¡Producto añadido al carrito!");
+        const closeSidePanels = () => {
+            views.menu.classList.remove('active');
+            overlays.menu.classList.remove('show');
+            views.cart.classList.remove('open');
+            overlays.cart.classList.remove('show');
+        };
+
+        document.getElementById('closeMenu').onclick = closeSidePanels;
+        overlays.menu.onclick = closeSidePanels;
+
+        // LÓGICA PERFIL
+        const abrirPerfil = (e) => {
+            if(e) e.preventDefault();
+            closeSidePanels();
+            const nombreHeader = document.getElementById('userBtn').innerText.replace('Hola, ', '').trim();
+            document.getElementById('profileNombre').value = nombreHeader;
+            showView('profile');
+        };
+
+        document.getElementById('menuMyAccount').onclick = abrirPerfil;
+        document.getElementById('btnBackFromProfile').onclick = () => showView('store');
+
+        // LÓGICA CARRITO
+        document.getElementById('openCartBtn').onclick = () => {
+            views.cart.classList.add('open');
+            overlays.cart.classList.add('show');
+        };
+        document.getElementById('closeCart').onclick = closeSidePanels;
+        overlays.cart.onclick = closeSidePanels;
+
+        // BOTÓN USUARIO (HEADER)
+        document.getElementById('userBtn').onclick = (e) => {
+            const label = document.getElementById('userBtn').innerText;
+            if (label.includes('Hola')) {
+                abrirPerfil(e);
+            } else {
+                views.auth.classList.add('is-visible');
             }
-        });
+        };
 
-        // --- NAVEGACIÓN TIENDA / DETALLE ---
-        const productCards = document.querySelectorAll('.product-card');
-        productCards.forEach(card => {
+        // NAVEGACIÓN PRODUCTOS
+        document.querySelectorAll('.product-card').forEach(card => {
             card.onclick = () => {
-                const nombre = card.querySelector('.product-name').innerText;
-                const precio = card.querySelector('.price-current').innerText;
-                const imagenSrc = card.querySelector('img').src;
-
-                document.getElementById('detailTitle').innerText = nombre;
-                document.getElementById('detailPrice').innerText = precio;
-                document.getElementById('detailMainImg').src = imagenSrc;
-
-                mainStoreView.style.display = 'none';
-                productDetailView.style.display = 'block';
-                window.scrollTo(0,0);
+                document.getElementById('detailTitle').innerText = card.querySelector('.product-name').innerText;
+                document.getElementById('detailPrice').innerText = card.querySelector('.price-current').innerText;
+                document.getElementById('detailMainImg').src = card.querySelector('img').src;
+                showView('detail');
             };
         });
+        document.getElementById('btnBackToStore').onclick = () => showView('store');
 
-        document.getElementById('btnBackToStore').onclick = () => {
-            productDetailView.style.display = 'none';
-            mainStoreView.style.display = 'block';
+        // FORMULARIO PERFIL (GUARDAR)
+        document.getElementById('profileForm').onsubmit = (e) => {
+            e.preventDefault();
+            const nuevoNombre = document.getElementById('profileNombre').value;
+            document.getElementById('userBtn').innerHTML = `<span>Hola, ${nuevoNombre}</span>`;
+            alert("Perfil actualizado correctamente.");
         };
 
-        // --- LÓGICA AUTH ---
-        const userBtn = document.getElementById('userBtn');
-        const closeAuth = document.getElementById('closeAuth');
-        userBtn.onclick = () => authInterface.classList.add('is-visible');
-        closeAuth.onclick = () => authInterface.classList.remove('is-visible');
-
-        document.getElementById('toggleLogin').onclick = () => {
-            document.getElementById('registerView').style.display = 'none';
-            document.getElementById('loginView').style.display = 'flex';
-        };
-        document.getElementById('toggleRegister').onclick = () => {
-            document.getElementById('loginView').style.display = 'none';
-            document.getElementById('registerView').style.display = 'flex';
-        };
-
-        // --- FETCHES (Login/Register) ---
+        // AUTH (FETCHES SIMPLIFICADOS)
         document.getElementById('btnRegistrarFinal').onclick = async () => {
             const nombre = document.getElementById('regNombre').value;
             const correo = document.getElementById('regCorreo').value;
@@ -293,7 +268,7 @@
                     body: JSON.stringify({nombre, correo, password})
                 });
                 if(res.ok) { alert("¡Registro exitoso!"); document.getElementById('toggleLogin').click(); }
-            } catch(e) { alert("Error de conexión"); }
+            } catch(e) { alert("Error"); }
         };
 
         document.getElementById('btnEntrarLogin').onclick = async () => {
@@ -307,74 +282,23 @@
                 });
                 const data = await res.json();
                 if(res.ok) {
-                    alert("Bienvenido " + data.user.nombre);
-                    authInterface.classList.remove('is-visible');
-                    userBtn.innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
-                } else { alert("Error: " + data.error); }
-            } catch(e) { alert("Error de conexión"); }
+                    document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
+                    document.getElementById('profileCorreo').value = correo;
+                    views.auth.classList.remove('is-visible');
+                } else { alert(data.error); }
+            } catch(e) { alert("Error"); }
         };
-        // --- ELEMENTOS NUEVOS ---
-const userProfileView = document.getElementById('userProfileView');
-const btnBackFromProfile = document.getElementById('btnBackFromProfile');
-const profileForm = document.getElementById('profileForm');
 
-// Función para abrir el Perfil
-const abrirPerfil = (e) => {
-    if(e) e.preventDefault();
-    
-    // Ocultamos todo lo demás
-    mainStoreView.style.display = 'none';
-    productDetailView.style.display = 'none';
-    authInterface.classList.remove('is-visible'); // Cierra login si estaba abierto
-    if(sideMenu) sideMenu.classList.remove('active'); // Cierra menú lateral
-    if(menuOverlay) menuOverlay.classList.remove('show');
-    
-    // Mostramos Perfil
-    userProfileView.style.display = 'block';
-    window.scrollTo(0,0);
-
-    // Llenar datos actuales (si existen en el header o localStorage)
-    const nombreActual = document.getElementById('userBtn').innerText.replace('Hola, ', '');
-    document.getElementById('profileNombre').value = nombreActual;
-};
-
-// --- EVENTOS PARA ABRIR PERFIL ---
-// 1. Al hacer clic en el nombre del header
-document.getElementById('userBtn').onclick = (e) => {
-    const texto = document.getElementById('userBtn').innerText;
-    if (texto.includes('Hola')) {
-        abrirPerfil(e);
-    } else {
-        authInterface.classList.add('is-visible');
-    }
-};
-
-// 2. Al hacer clic en "Mi cuenta" del menú lateral
-document.getElementById('menuMyAccount').onclick = abrirPerfil;
-
-// --- VOLVER A LA TIENDA ---
-btnBackFromProfile.onclick = () => {
-    userProfileView.style.display = 'none';
-    mainStoreView.style.display = 'block';
-};
-
-// --- LÓGICA DE GUARDAR ---
-profileForm.onsubmit = async (e) => {
-    e.preventDefault();
-    
-    const datos = {
-        nombre: document.getElementById('profileNombre').value,
-        telefono: document.getElementById('profileTelefono').value,
-        direccion: document.getElementById('profileDireccion').value
-    };
-
-    // Aquí podrías hacer un fetch a tu servidor para guardar en la base de datos
-    console.log("Datos a guardar:", datos);
-    alert("¡Datos actualizados correctamente!");
-    
-    // Actualizar el nombre en el header dinámicamente
-    document.getElementById('userBtn').innerHTML = `<span>Hola, ${datos.nombre}</span>`;
-};
+        // TOGGLES LOGIN/REGISTER
+        document.getElementById('toggleLogin').onclick = () => {
+            document.getElementById('registerView').style.display = 'none';
+            document.getElementById('loginView').style.display = 'flex';
+        };
+        document.getElementById('toggleRegister').onclick = () => {
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('registerView').style.display = 'flex';
+        };
+        document.getElementById('closeAuth').onclick = () => views.auth.classList.remove('is-visible');
     </script>
 </body>
 </html>
