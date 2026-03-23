@@ -8,6 +8,42 @@
 </head>
 <body>
 
+    <div id="sideMenu" class="side-menu">
+        <div class="menu-header">
+            <span class="logo-text">Valor Noble</span>
+            <span id="closeMenu" class="close-menu-btn">&times;</span>
+        </div>
+        <nav class="menu-links">
+            <a href="#" id="menuMyAccount"><span class="menu-icon">👤</span> Mi cuenta</a>
+            <a href="#"><span class="menu-icon">🛍️</span> Mis compras</a>
+            <a href="#"><span class="menu-icon">❓</span> Ayuda</a>
+            <hr>
+            <a href="#" id="menuLogout" style="color: #e74c3c;"><span class="menu-icon">🚪</span> Cerrar Sesión</a>
+        </nav>
+    </div>
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Tu Carrito (<span id="cartCountLabel">0</span>)</h3>
+            <span id="closeCart" class="close-cart-btn">&times;</span>
+        </div>
+        <div id="cartItemsContainer" class="cart-items">
+            <div class="cart-empty-msg" style="text-align: center; margin-top: 50px; color: #888;">
+                Tu carrito está vacío.
+            </div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotalPrice">$0.00</span>
+            </div>
+            <button class="checkout-btn">Finalizar Compra</button>
+            <button id="clearCart" class="clear-btn">Vaciar Carrito</button>
+        </div>
+    </div>
+    <div id="cartOverlay" class="cart-overlay"></div>
+
     <header class="main-header">
         <div class="middle-bar">
             <div class="container middle-bar-content">
@@ -15,7 +51,8 @@
                     <span class="logo-icon">&#128717;<span class="speed-lines"></span></span>
                     <span class="logo-text">Valor Noble</span>
                 </div>
-                <div class="hamburger-menu">&#9776;</div>
+                <div class="hamburger-menu" style="cursor: pointer;">&#9776;</div>
+                
                 <div class="search-bar">
                     <div class="categories-dropdown">
                         Todas las Categorias <span class="arrow-down">&#9662;</span>
@@ -23,9 +60,12 @@
                     <input type="text" placeholder="Buscar">
                     <button class="search-button">&#128269;</button>
                 </div>
+
                 <div class="user-actions">
                     <div class="icon-badge"> &#9825; <span class="badge">0</span> </div>
-                    <div class="icon-badge"> &#128722; <span class="badge badge-primary">0</span> </div>
+                    <div class="icon-badge" id="openCartBtn" style="cursor: pointer;"> 
+                        &#128722; <span class="badge badge-primary" id="mainCartBadge">0</span> 
+                    </div>
                     <div id="userBtn" class="icon-user" style="cursor: pointer;"> &#128100; </div>
                 </div>
             </div>
@@ -43,7 +83,7 @@
                 <div class="product-card" style="cursor: pointer;">
                     <div class="product-image">
                         <span class="badge badge-new">NEW</span>
-                        <img src="C:\Users\pacod\OneDrive\Escritorio\Proyecto Software\Imagenes\R.jpg" alt="Producto 1">
+                        <img src="./Imagenes/R.jpg" alt="Producto 1">
                     </div>
                     <div class="product-info">
                         <h3 class="product-name">Imagen prueba 1</h3>
@@ -57,7 +97,7 @@
                     <div class="product-image">
                         <span class="badge badge-new">NEW</span>
                         <span class="badge badge-discount">17%</span>
-                        <img src="C:\Users\pacod\OneDrive\Escritorio\Proyecto Software\Imagenes\1000_F_833778350_E3Tzhsn02OjQUJ8oltJBEU6874IQKxkI.jpg" alt="Producto 2">
+                        <img src="./Imagenes/1000_F_833778350_E3Tzhsn02OjQUJ8oltJBEU6874IQKxkI.jpg" alt="Producto 2">
                     </div>
                     <div class="product-info">
                         <h3 class="product-name">Imagen prueba 2</h3>
@@ -73,49 +113,19 @@
     <div id="productDetailView" class="product-detail-container" style="display: none; padding: 50px 0;">
         <div class="container">
             <button id="btnBackToStore" style="margin-bottom: 20px; cursor: pointer; background: none; border: 1px solid #ddd; padding: 5px 15px;">← Volver</button>
-            
             <div style="display: flex; gap: 50px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 300px;">
                     <div style="background: #f8f8f8; padding: 20px; border-radius: 8px;">
                         <img id="detailMainImg" src="" alt="Main" style="width: 100%; border-radius: 8px;">
                     </div>
-                    <div style="display: flex; gap: 10px; margin-top: 15px;">
-                        <img class="thumb" src="" style="width: 80px; height: 80px; border: 1px solid #ddd; cursor: pointer; object-fit: cover;">
-                        <img class="thumb" src="" style="width: 80px; height: 80px; border: 1px solid #ddd; cursor: pointer; object-fit: cover;">
-                        <img class="thumb" src="" style="width: 80px; height: 80px; border: 1px solid #ddd; cursor: pointer; object-fit: cover;">
-                    </div>
                 </div>
-
                 <div style="flex: 1; min-width: 300px;">
                     <h1 id="detailTitle" style="font-size: 2rem; margin-bottom: 10px;">Nombre del Producto</h1>
                     <div style="margin-bottom: 20px;">
                         <span id="detailPrice" style="font-size: 1.5rem; color: #ff5722; font-weight: bold;">$0.00</span>
                     </div>
-                    
-                    <p style="color: #666; line-height: 1.6; margin-bottom: 30px;">
-                        Descripcion de prueba 
-                    </p>
-
-                    <div style="margin-bottom: 20px;">
-                        <strong>Color:</strong>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <div style="width: 20px; height: 20px; background: olive; border-radius: 50%; cursor: pointer;"></div>
-                            <div style="width: 20px; height: 20px; background: black; border-radius: 50%; cursor: pointer;"></div>
-                            <div style="width: 20px; height: 20px; background: red; border-radius: 50%; cursor: pointer;"></div>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 30px;">
-                        <div style="border: 1px solid #ddd; padding: 10px 20px; display: flex; gap: 15px;">
-                            <span>-</span> <span>1</span> <span>+</span>
-                        </div>
-                        <button style="background: #8c9b8c; color: white; border: none; padding: 12px 40px; font-weight: bold; cursor: pointer; flex-grow: 1;">Add to Cart</button>
-                    </div>
-
-                    <div style="border-top: 1px solid #eee; padding-top: 20px; font-size: 0.9rem; color: #888;">
-                        <p><strong>SKU:</strong> VAL-001</p>
-                        <p><strong>Categoría:</strong> General</p>
-                    </div>
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 30px;">Descripción detallada de la artesanía seleccionada.</p>
+                    <button class="add-to-cart-btn" style="background: #8c9b8c; color: white; border: none; padding: 12px 40px; font-weight: bold; cursor: pointer; width: 100%;">Añadir al Carrito</button>
                 </div>
             </div>
         </div>
@@ -126,93 +136,150 @@
             <div id="closeAuth" class="close-auth">&#10006;</div>
             <div class="auth-column" id="registerView">
                 <h2 class="auth-title">Crear Cuenta</h2>
-                <div class="form-group">
-                    <label class="form-label">Nombre de Usuario</label>
-                    <input type="text" id="regNombre" class="form-input" placeholder="Tu nombre">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Correo Electrónico</label>
-                    <input type="email" id="regCorreo" class="form-input" placeholder="ejemplo@correo.com">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Contraseña</label>
-                    <input type="password" id="regPass" class="form-input" placeholder="Mínimo 8 caracteres">
-                </div>
+                <div class="form-group"><input type="text" id="regNombre" class="form-input" placeholder="Tu nombre"></div>
+                <div class="form-group"><input type="email" id="regCorreo" class="form-input" placeholder="Correo"></div>
+                <div class="form-group"><input type="password" id="regPass" class="form-input" placeholder="Contraseña"></div>
                 <button class="auth-button" id="btnRegistrarFinal">Registrarse</button>
                 <div class="already-account">¿Ya tienes cuenta? <button id="toggleLogin" class="text-button">Iniciar Sesión</button></div>
             </div>
-
             <div class="auth-column" id="loginView" style="display: none;">
                 <h2 class="auth-title">Iniciar Sesión</h2>
-                <div class="form-group">
-                    <label class="form-label">Correo o Usuario</label>
-                    <input type="text" id="loginUser" class="form-input" placeholder="Usuario/Email">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Contraseña</label>
-                    <input type="password" id="loginPass" class="form-input" placeholder="Tu contraseña">
-                </div>
+                <div class="form-group"><input type="text" id="loginUser" class="form-input" placeholder="Correo"></div>
+                <div class="form-group"><input type="password" id="loginPass" class="form-input" placeholder="Contraseña"></div>
                 <button class="auth-button" id="btnEntrarLogin">Entrar</button>
                 <div class="already-account">¿No tienes cuenta? <button id="toggleRegister" class="text-button">Registrarse</button></div>
             </div>
         </div>
     </div>
 
-    <footer style="background: #2F2A26; color: white; padding: 20px 0; text-align: center; width: 100%;">
-        <div class="container">
-            <p>&copy; 2026 Valor Noble - Todos los derechos reservados.</p>
-        </div>
+    <footer style="background: #2F2A26; color: white; padding: 20px 0; text-align: center;">
+        <p>&copy; 2026 Valor Noble - Todos los derechos reservados.</p>
     </footer>
 
     <script>
-        // --- ELEMENTOS ---
-        const authInterface = document.getElementById('authInterface');
-        const registerView = document.getElementById('registerView');
-        const loginView = document.getElementById('loginView');
+        // --- SELECTORES ---
         const mainStoreView = document.getElementById('mainStoreView');
         const productDetailView = document.getElementById('productDetailView');
-        
+        const authInterface = document.getElementById('authInterface');
+        const cartSidebar = document.getElementById('cartSidebar');
+        const cartOverlay = document.getElementById('cartOverlay');
+        const sideMenu = document.getElementById('sideMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+
+        // --- LÓGICA MENÚ IZQUIERDO (HAMBURGUESA) ---
+        const hamburgerBtn = document.querySelector('.hamburger-menu');
+        const closeMenuBtn = document.getElementById('closeMenu');
+
+        const toggleMenu = (open) => {
+            sideMenu.classList.toggle('active', open);
+            menuOverlay.classList.toggle('show', open);
+        };
+
+        hamburgerBtn.onclick = () => toggleMenu(true);
+        closeMenuBtn.onclick = () => toggleMenu(false);
+        menuOverlay.onclick = () => toggleMenu(false);
+
+        document.getElementById('menuMyAccount').onclick = (e) => {
+            e.preventDefault();
+            toggleMenu(false);
+            authInterface.classList.add('is-visible');
+        };
+
+        // --- LÓGICA CARRITO DERECHO ---
+        const openCartBtn = document.getElementById('openCartBtn');
+        const closeCartBtn = document.getElementById('closeCart');
+
+        const toggleCart = (show) => {
+            cartSidebar.classList.toggle('open', show);
+            cartOverlay.classList.toggle('show', show);
+        };
+
+        openCartBtn.onclick = () => toggleCart(true);
+        closeCartBtn.onclick = () => toggleCart(false);
+        cartOverlay.onclick = () => toggleCart(false);
+
+        // Añadir al carrito
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('add-to-cart-btn')) {
+                const badge = document.getElementById('mainCartBadge');
+                const label = document.getElementById('cartCountLabel');
+                let count = parseInt(badge.innerText) + 1;
+                badge.innerText = count;
+                label.innerText = count;
+                alert("¡Producto añadido al carrito!");
+            }
+        });
+
         // --- NAVEGACIÓN TIENDA / DETALLE ---
         const productCards = document.querySelectorAll('.product-card');
-        const btnBackToStore = document.getElementById('btnBackToStore');
-
         productCards.forEach(card => {
             card.onclick = () => {
-                // Extraer datos de la tarjeta clickeada
                 const nombre = card.querySelector('.product-name').innerText;
                 const precio = card.querySelector('.price-current').innerText;
                 const imagenSrc = card.querySelector('img').src;
 
-                // Llenar la vista de detalle
                 document.getElementById('detailTitle').innerText = nombre;
                 document.getElementById('detailPrice').innerText = precio;
                 document.getElementById('detailMainImg').src = imagenSrc;
-                
-                // Actualizar miniaturas
-                const thumbs = document.querySelectorAll('.thumb');
-                thumbs.forEach(t => t.src = imagenSrc);
 
-                // Cambiar vistas
                 mainStoreView.style.display = 'none';
                 productDetailView.style.display = 'block';
                 window.scrollTo(0,0);
             };
         });
 
-        btnBackToStore.onclick = () => {
+        document.getElementById('btnBackToStore').onclick = () => {
             productDetailView.style.display = 'none';
             mainStoreView.style.display = 'block';
         };
 
-        // --- LÓGICA AUTH (Tu código original) ---
-        const userBtn = document.getElementById('userBtn'); 
+        // --- LÓGICA AUTH ---
+        const userBtn = document.getElementById('userBtn');
         const closeAuth = document.getElementById('closeAuth');
         userBtn.onclick = () => authInterface.classList.add('is-visible');
         closeAuth.onclick = () => authInterface.classList.remove('is-visible');
-        document.getElementById('toggleLogin').onclick = () => { registerView.style.display = 'none'; loginView.style.display = 'flex'; };
-        document.getElementById('toggleRegister').onclick = () => { loginView.style.display = 'none'; registerView.style.display = 'flex'; };
 
-        // (Aquí irían tus funciones fetch para login/register que ya tienes)
+        document.getElementById('toggleLogin').onclick = () => {
+            document.getElementById('registerView').style.display = 'none';
+            document.getElementById('loginView').style.display = 'flex';
+        };
+        document.getElementById('toggleRegister').onclick = () => {
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('registerView').style.display = 'flex';
+        };
+
+        // --- FETCHES (Login/Register) ---
+        document.getElementById('btnRegistrarFinal').onclick = async () => {
+            const nombre = document.getElementById('regNombre').value;
+            const correo = document.getElementById('regCorreo').value;
+            const password = document.getElementById('regPass').value;
+            try {
+                const res = await fetch('/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({nombre, correo, password})
+                });
+                if(res.ok) { alert("¡Registro exitoso!"); document.getElementById('toggleLogin').click(); }
+            } catch(e) { alert("Error de conexión"); }
+        };
+
+        document.getElementById('btnEntrarLogin').onclick = async () => {
+            const correo = document.getElementById('loginUser').value;
+            const password = document.getElementById('loginPass').value;
+            try {
+                const res = await fetch('/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({correo, password})
+                });
+                const data = await res.json();
+                if(res.ok) {
+                    alert("Bienvenido " + data.user.nombre);
+                    authInterface.classList.remove('is-visible');
+                    userBtn.innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
+                } else { alert("Error: " + data.error); }
+            } catch(e) { alert("Error de conexión"); }
+        };
     </script>
 </body>
 </html>

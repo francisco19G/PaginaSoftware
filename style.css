@@ -559,3 +559,206 @@ body {
         padding: 20px;
     }
 }
+.product-detail-container { padding: 50px 0; background: #fff; min-height: 80vh; }
+.back-button { background: none; border: none; cursor: pointer; color: #7f8c8d; margin-bottom: 20px; font-weight: bold; }
+
+.detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
+
+/* Galería */
+.main-img-container { background: #f8f8f8; border-radius: 8px; margin-bottom: 15px; }
+.main-img-container img { width: 100%; border-radius: 8px; }
+.thumb-gallery { display: flex; gap: 10px; }
+.thumb { width: 80px; height: 80px; background: #f8f8f8; cursor: pointer; border: 2px solid transparent; border-radius: 4px; }
+.thumb.active { border-color: #8c9b8c; }
+
+/* Info */
+.detail-info h1 { font-size: 2rem; color: #2F2A26; margin-bottom: 15px; }
+.detail-price { margin-bottom: 20px; }
+#detailPriceCurrent { font-size: 1.5rem; color: #ff5722; font-weight: bold; }
+#detailPriceOld { text-decoration: line-through; color: #bdc3c7; margin-left: 10px; }
+.detail-rating { color: #f1c40f; margin-top: 5px; font-size: 0.9rem; }
+
+.detail-description { line-height: 1.6; color: #7f8c8d; margin-bottom: 30px; }
+
+/* Botones de acción */
+.action-buttons { display: flex; gap: 15px; margin-bottom: 30px; }
+.quantity-input { border: 1px solid #ddd; display: flex; align-items: center; }
+.quantity-input button { border: none; background: none; width: 30px; cursor: pointer; }
+.quantity-input input { width: 40px; text-align: center; border: none; }
+.add-to-cart-btn { background: #8c9b8c; color: white; border: none; padding: 12px 40px; border-radius: 4px; cursor: pointer; flex-grow: 1; font-weight: bold; }
+
+.meta-data { border-top: 1px solid #eee; padding-top: 20px; font-size: 0.9rem; color: #2F2A26; }
+.olive { background: #8c9b8c; } .black { background: #000; } .red { background: #e74c3c; }
+.dot { width: 15px; height: 15px; border-radius: 50%; display: inline-block; margin-right: 5px; cursor: pointer; }
+
+
+/* CARRITO DE COMPRAS */
+/* Sidebar del Carrito */
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px; /* Oculto por defecto */
+    width: 400px;
+    height: 100%;
+    background: white;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    z-index: 2000;
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-sidebar.open { right: 0; }
+
+/* Fondo oscuro */
+.cart-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    z-index: 1999;
+}
+
+.cart-overlay.show { display: block; }
+
+/* --- CARRITO LATERAL (SIDEBAR) --- */
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: -450px; /* Escondido afuera de la pantalla */
+    width: 400px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    z-index: 3000;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Clase que activa el JS para mostrarlo */
+.cart-sidebar.open {
+    right: 0;
+}
+
+/* Fondo oscuro detrás del carrito */
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none; /* Oculto por defecto */
+    z-index: 2999;
+}
+
+.cart-overlay.show {
+    display: block;
+}
+
+/* Estilos internos para que se vea bonito */
+.cart-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+}
+
+.cart-items {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.cart-footer {
+    padding: 20px;
+    border-top: 2px solid #eee;
+    background: #fff;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.checkout-btn {
+    width: 100%;
+    background: #2F2A26;
+    color: white;
+    border: none;
+    padding: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.clear-btn {
+    width: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    cursor: pointer;
+    color: #888;
+}
+
+
+/* --- MENÚ LATERAL IZQUIERDO --- */
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -300px; /* Escondido a la izquierda */
+    width: 280px;
+    height: 100vh;
+    background: white;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+    z-index: 4000; /* Por encima de todo */
+    transition: left 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Clase que activa el JS para mostrarlo */
+.side-menu.active {
+    left: 0;
+}
+
+/* Fondo oscuro (Overlay) */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    z-index: 3999;
+}
+
+.menu-overlay.show {
+    display: block;
+}
+
+/* Estilos de los links dentro del menú */
+.menu-links {
+    padding: 20px 0;
+}
+
+.menu-links a {
+    display: block;
+    padding: 15px 25px;
+    color: #2F2A26;
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid #f9f9f9;
+}
+
+.menu-links a:hover {
+    background: #f1f1f1;
+}
