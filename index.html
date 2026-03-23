@@ -151,7 +151,40 @@
             </div>
         </div>
     </div>
+<div id="userProfileView" class="user-profile-container" style="display: none; padding: 50px 0;">
+    <div class="container">
+        <button id="btnBackFromProfile" style="margin-bottom: 20px; cursor: pointer; background: none; border: 1px solid #ddd; padding: 5px 15px;">← Volver a la tienda</button>
+        
+        <div class="profile-card" style="max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <h2 style="margin-bottom: 25px; color: #2F2A26; border-bottom: 2px solid #8c9b8c; padding-bottom: 10px;">Mi Perfil</h2>
+            
+            <form id="profileForm">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre Completo</label>
+                    <input type="text" id="profileNombre" class="form-input" placeholder="Tu nombre">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Correo Electrónico</label>
+                    <input type="email" id="profileCorreo" class="form-input" readonly style="background: #f9f9f9; cursor: not-allowed;">
+                    <small style="color: #888;">El correo no se puede cambiar.</small>
+                </div>
 
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Teléfono</label>
+                    <input type="tel" id="profileTelefono" class="form-input" placeholder="Ej: 5512345678">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Dirección de Envío</label>
+                    <textarea id="profileDireccion" class="form-input" style="height: 80px; padding: 10px;" placeholder="Calle, número, colonia y CP"></textarea>
+                </div>
+
+                <button type="submit" class="auth-button" style="background: #2F2A26; width: 100%;">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+</div>
     <footer style="background: #2F2A26; color: white; padding: 20px 0; text-align: center;">
         <p>&copy; 2026 Valor Noble - Todos los derechos reservados.</p>
     </footer>
@@ -280,6 +313,68 @@
                 } else { alert("Error: " + data.error); }
             } catch(e) { alert("Error de conexión"); }
         };
+        // --- ELEMENTOS NUEVOS ---
+const userProfileView = document.getElementById('userProfileView');
+const btnBackFromProfile = document.getElementById('btnBackFromProfile');
+const profileForm = document.getElementById('profileForm');
+
+// Función para abrir el Perfil
+const abrirPerfil = (e) => {
+    if(e) e.preventDefault();
+    
+    // Ocultamos todo lo demás
+    mainStoreView.style.display = 'none';
+    productDetailView.style.display = 'none';
+    authInterface.classList.remove('is-visible'); // Cierra login si estaba abierto
+    if(sideMenu) sideMenu.classList.remove('active'); // Cierra menú lateral
+    if(menuOverlay) menuOverlay.classList.remove('show');
+    
+    // Mostramos Perfil
+    userProfileView.style.display = 'block';
+    window.scrollTo(0,0);
+
+    // Llenar datos actuales (si existen en el header o localStorage)
+    const nombreActual = document.getElementById('userBtn').innerText.replace('Hola, ', '');
+    document.getElementById('profileNombre').value = nombreActual;
+};
+
+// --- EVENTOS PARA ABRIR PERFIL ---
+// 1. Al hacer clic en el nombre del header
+document.getElementById('userBtn').onclick = (e) => {
+    const texto = document.getElementById('userBtn').innerText;
+    if (texto.includes('Hola')) {
+        abrirPerfil(e);
+    } else {
+        authInterface.classList.add('is-visible');
+    }
+};
+
+// 2. Al hacer clic en "Mi cuenta" del menú lateral
+document.getElementById('menuMyAccount').onclick = abrirPerfil;
+
+// --- VOLVER A LA TIENDA ---
+btnBackFromProfile.onclick = () => {
+    userProfileView.style.display = 'none';
+    mainStoreView.style.display = 'block';
+};
+
+// --- LÓGICA DE GUARDAR ---
+profileForm.onsubmit = async (e) => {
+    e.preventDefault();
+    
+    const datos = {
+        nombre: document.getElementById('profileNombre').value,
+        telefono: document.getElementById('profileTelefono').value,
+        direccion: document.getElementById('profileDireccion').value
+    };
+
+    // Aquí podrías hacer un fetch a tu servidor para guardar en la base de datos
+    console.log("Datos a guardar:", datos);
+    alert("¡Datos actualizados correctamente!");
+    
+    // Actualizar el nombre en el header dinámicamente
+    document.getElementById('userBtn').innerHTML = `<span>Hola, ${datos.nombre}</span>`;
+};
     </script>
 </body>
 </html>
