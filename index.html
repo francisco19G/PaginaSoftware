@@ -43,17 +43,15 @@
         <div class="middle-bar">
             <div class="container middle-bar-content">
                 <div class="logo-area">
-                    <span class="logo-icon">&#128717;<span class="speed-lines"></span></span>
+                    <span class="logo-icon">&#128717;</span>
                     <span class="logo-text">Valor Noble</span>
                 </div>
                 <div class="hamburger-menu" style="cursor: pointer;">&#9776;</div>
                 <div class="search-bar">
-                    <div class="categories-dropdown">Todas las Categorias <span class="arrow-down">&#9662;</span></div>
-                    <input type="text" placeholder="Buscar">
+                    <input type="text" placeholder="Buscar artesanías...">
                     <button class="search-button">&#128269;</button>
                 </div>
                 <div class="user-actions">
-                    <div class="icon-badge"> &#9825; <span class="badge">0</span> </div>
                     <div class="icon-badge" id="openCartBtn" style="cursor: pointer;"> 
                         &#128722; <span class="badge badge-primary" id="mainCartBadge">0</span> 
                     </div>
@@ -70,13 +68,19 @@
                 <div class="title-underline"></div>
             </div>
             <div class="products-grid">
-                <div class="product-card" style="cursor: pointer;">
+                <div class="product-card">
                     <div class="product-image"><img src="./Imagenes/R.jpg" alt="P1"></div>
-                    <div class="product-info"><h3 class="product-name">Imagen prueba 1</h3><span class="price-current">$120.32</span></div>
+                    <div class="product-info">
+                        <h3 class="product-name">Imagen prueba 1</h3>
+                        <span class="price-current">$120.32</span>
+                    </div>
                 </div>
-                <div class="product-card" style="cursor: pointer;">
+                <div class="product-card">
                     <div class="product-image"><img src="./Imagenes/1000_F_833778350_E3Tzhsn02OjQUJ8oltJBEU6874IQKxkI.jpg" alt="P2"></div>
-                    <div class="product-info"><h3 class="product-name">Imagen prueba 2</h3><span class="price-current">$65.86</span></div>
+                    <div class="product-info">
+                        <h3 class="product-name">Imagen prueba 2</h3>
+                        <span class="price-current">$65.86</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -85,12 +89,13 @@
     <div id="productDetailView" style="display: none; padding: 50px 0;">
         <div class="container">
             <button id="btnBackToStore">← Volver</button>
-            <div style="display: flex; gap: 40px; margin-top: 20px;">
-                <img id="detailMainImg" src="" style="width: 400px; border-radius: 8px;">
-                <div>
+            <div style="display: flex; gap: 40px; margin-top: 20px; flex-wrap: wrap;">
+                <img id="detailMainImg" src="" style="width: 100%; max-width: 400px; border-radius: 8px;">
+                <div style="flex: 1; min-width: 300px;">
                     <h1 id="detailTitle"></h1>
-                    <h2 id="detailPrice" style="color: #ff5722;"></h2>
-                    <button class="add-to-cart-btn" style="background: #8c9b8c; color: white; padding: 10px 30px; border: none; cursor: pointer;">Añadir al Carrito</button>
+                    <h2 id="detailPrice" style="color: #ff5722; margin-bottom: 20px;"></h2>
+                    <p style="color: #666; margin-bottom: 30px;">Descripción detallada de esta pieza única de Valor Noble.</p>
+                    <button class="add-to-cart-btn" style="background: #8c9b8c; color: white; padding: 15px 40px; border: none; cursor: pointer; width: 100%; font-weight: bold;">Añadir al Carrito</button>
                 </div>
             </div>
         </div>
@@ -99,14 +104,14 @@
     <div id="userProfileView" style="display: none; padding: 50px 0;">
         <div class="container">
             <button id="btnBackFromProfile">← Volver</button>
-            <div class="profile-card" style="max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd;">
-                <h2>Mi Perfil</h2>
+            <div class="profile-card" style="max-width: 500px; margin: 40px auto; padding: 30px; border: 1px solid #ddd; background: #fff; border-radius: 8px;">
+                <h2 style="border-bottom: 2px solid #8c9b8c; padding-bottom: 10px; margin-bottom: 20px;">Mi Perfil</h2>
                 <form id="profileForm">
-                    <input type="text" id="profileNombre" class="form-input" style="margin-bottom: 10px;">
-                    <input type="email" id="profileCorreo" class="form-input" readonly style="background: #eee; margin-bottom: 10px;">
-                    <input type="tel" id="profileTelefono" class="form-input" placeholder="Teléfono" style="margin-bottom: 10px;">
-                    <textarea id="profileDireccion" class="form-input" placeholder="Dirección"></textarea>
-                    <button type="submit" class="auth-button">Guardar Cambios</button>
+                    <div class="form-group"><label>Nombre</label><input type="text" id="profileNombre" class="form-input"></div>
+                    <div class="form-group"><label>Correo</label><input type="email" id="profileCorreo" class="form-input" readonly style="background: #eee;"></div>
+                    <div class="form-group"><label>Teléfono</label><input type="tel" id="profileTelefono" class="form-input" placeholder="Tu teléfono"></div>
+                    <div class="form-group"><label>Dirección</label><textarea id="profileDireccion" class="form-input" placeholder="Dirección de envío"></textarea></div>
+                    <button type="submit" class="auth-button" style="width: 100%; background: #2F2A26;">Guardar Cambios</button>
                 </form>
             </div>
         </div>
@@ -127,10 +132,9 @@
 
             <div class="auth-column" id="verifyView" style="display: none;">
                 <h2 class="auth-title">Verifica tu Correo</h2>
-                <p style="text-align: center; margin-bottom: 15px; color: #666;">Ingresa el código que enviamos a tu email.</p>
-                <div class="form-group"><input type="text" id="inputCodigo" class="form-input" placeholder="Código de 6 dígitos"></div>
+                <p style="text-align: center; margin-bottom: 15px; color: #666;">Ingresa el código enviado a tu email.</p>
+                <div class="form-group"><input type="text" id="inputCodigo" class="form-input" placeholder="6 dígitos"></div>
                 <button class="auth-button" id="btnConfirmarCodigo">Activar Cuenta</button>
-                <div class="already-account"><button id="btnBackToReg" class="text-button">Volver al registro</button></div>
             </div>
 
             <div class="auth-column" id="loginView" style="display: none;">
@@ -145,121 +149,131 @@
 
     <script>
         // SELECTORES
-        const storeView = document.getElementById('mainStoreView');
-        const detailView = document.getElementById('productDetailView');
-        const profileView = document.getElementById('userProfileView');
-        const authModal = document.getElementById('authInterface');
-        const regView = document.getElementById('registerView');
-        const logView = document.getElementById('loginView');
-        const verView = document.getElementById('verifyView');
+        const ui = {
+            store: document.getElementById('mainStoreView'),
+            detail: document.getElementById('productDetailView'),
+            profile: document.getElementById('userProfileView'),
+            authModal: document.getElementById('authInterface'),
+            reg: document.getElementById('registerView'),
+            log: document.getElementById('loginView'),
+            ver: document.getElementById('verifyView'),
+            cart: document.getElementById('cartSidebar'),
+            menu: document.getElementById('sideMenu'),
+            overlayCart: document.getElementById('cartOverlay'),
+            overlayMenu: document.getElementById('menuOverlay')
+        };
 
-        // NAVEGACIÓN VISTAS
-        const showMainView = (view) => {
-            [storeView, detailView, profileView].forEach(v => v.style.display = 'none');
-            view.style.display = 'block';
+        // NAVEGACIÓN (Protege paneles laterales)
+        const showView = (viewName) => {
+            [ui.store, ui.detail, ui.profile].forEach(v => v.style.display = 'none');
+            ui[viewName].style.display = 'block';
+            ui.authModal.classList.remove('is-visible');
             window.scrollTo(0,0);
         };
 
-        // LÓGICA DE REGISTRO
-        document.getElementById('btnRegistrarFinal').onclick = async () => {
-            const nombre = document.getElementById('regNombre').value;
-            const correo = document.getElementById('regCorreo').value;
-            const password = document.getElementById('regPass').value;
-
-            try {
-                const res = await fetch('/register', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({nombre, correo, password})
-                });
-                const data = await res.json();
-
-                if (res.ok || data.success) {
-                    alert(data.message);
-                    localStorage.setItem('emailPendiente', correo);
-                    regView.style.display = 'none';
-                    verView.style.display = 'flex';
-                } else {
-                    alert("Error: " + data.error);
-                }
-            } catch (e) { alert("Error de conexión"); }
+        // PANELES LATERALES (Carrito / Menú)
+        const closePanels = () => {
+            ui.cart.classList.remove('open');
+            ui.menu.classList.remove('active');
+            ui.overlayCart.classList.remove('show');
+            ui.overlayMenu.classList.remove('show');
         };
 
-        // LÓGICA DE VERIFICACIÓN
-        document.getElementById('btnConfirmarCodigo').onclick = async () => {
-            const codigo = document.getElementById('inputCodigo').value;
-            const correo = localStorage.getItem('emailPendiente');
+        document.getElementById('openCartBtn').onclick = () => { ui.cart.classList.add('open'); ui.overlayCart.classList.add('show'); };
+        document.querySelector('.hamburger-menu').onclick = () => { ui.menu.classList.add('active'); ui.overlayMenu.classList.add('show'); };
+        [ui.overlayCart, ui.overlayMenu, document.getElementById('closeCart'), document.getElementById('closeMenu')].forEach(el => {
+            if(el) el.onclick = closePanels;
+        });
 
-            try {
-                const res = await fetch('/verify', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({correo, codigo})
-                });
-                const data = await res.json();
-
-                if (res.ok) {
-                    alert(data.message);
-                    verView.style.display = 'none';
-                    logView.style.display = 'flex';
-                } else {
-                    alert("Error: " + data.error);
-                }
-            } catch (e) { alert("Error al verificar"); }
+        // PERFIL
+        const abrirPerfil = (e) => {
+            if(e) e.preventDefault();
+            closePanels();
+            const nombreHeader = document.getElementById('userBtn').innerText.replace('Hola, ', '').trim();
+            document.getElementById('profileNombre').value = (nombreHeader === '👤') ? '' : nombreHeader;
+            showView('profile');
         };
 
-        // LÓGICA DE LOGIN
-        document.getElementById('btnEntrarLogin').onclick = async () => {
-            const correo = document.getElementById('loginUser').value;
-            const password = document.getElementById('loginPass').value;
+        document.getElementById('menuMyAccount').onclick = abrirPerfil;
+        document.getElementById('btnBackFromProfile').onclick = () => showView('store');
 
-            try {
-                const res = await fetch('/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({correo, password})
-                });
-                const data = await res.json();
-
-                if (res.ok) {
-                    document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
-                    document.getElementById('profileCorreo').value = correo;
-                    authModal.classList.remove('is-visible');
-                    alert("¡Bienvenido!");
-                } else {
-                    alert(data.error);
-                }
-            } catch (e) { alert("Error de conexión"); }
+        // BOTÓN USUARIO HEADER
+        document.getElementById('userBtn').onclick = (e) => {
+            if (document.getElementById('userBtn').innerText.includes('Hola')) abrirPerfil(e);
+            else ui.authModal.classList.add('is-visible');
         };
 
-        // ELEMENTOS AUXILIARES
-        document.getElementById('toggleLogin').onclick = () => { regView.style.display='none'; logView.style.display='flex'; };
-        document.getElementById('toggleRegister').onclick = () => { logView.style.display='none'; regView.style.display='flex'; };
-        document.getElementById('btnBackToReg').onclick = () => { verView.style.display='none'; regView.style.display='flex'; };
-        document.getElementById('userBtn').onclick = () => authModal.classList.add('is-visible');
-        document.getElementById('closeAuth').onclick = () => authModal.classList.remove('is-visible');
-
-        // TIENDA / DETALLE
+        // PRODUCTOS
         document.querySelectorAll('.product-card').forEach(card => {
             card.onclick = () => {
                 document.getElementById('detailTitle').innerText = card.querySelector('.product-name').innerText;
                 document.getElementById('detailPrice').innerText = card.querySelector('.price-current').innerText;
                 document.getElementById('detailMainImg').src = card.querySelector('img').src;
-                showMainView(detailView);
+                showView('detail');
             };
         });
-        document.getElementById('btnBackToStore').onclick = () => showMainView(storeView);
+        document.getElementById('btnBackToStore').onclick = () => showView('store');
 
-        // CARRITO / MENÚ (Faltaría añadir los toggle que ya tenías)
-        const sideMenu = document.getElementById('sideMenu');
-        document.querySelector('.hamburger-menu').onclick = () => {
-            sideMenu.classList.add('active');
-            document.getElementById('menuOverlay').classList.add('show');
+        // LÓGICA DE CARRITO (SIMULADA)
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('add-to-cart-btn')) {
+                const badge = document.getElementById('mainCartBadge');
+                const label = document.getElementById('cartCountLabel');
+                let count = parseInt(badge.innerText) + 1;
+                badge.innerText = count;
+                label.innerText = count;
+                alert("¡Añadido al carrito!");
+            }
+        });
+
+        // --- AUTH FETCHES ---
+        document.getElementById('btnRegistrarFinal').onclick = async () => {
+            const correo = document.getElementById('regCorreo').value;
+            const res = await fetch('/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ nombre: document.getElementById('regNombre').value, correo, password: document.getElementById('regPass').value })
+            });
+            const data = await res.json();
+            if (res.ok || data.success) {
+                alert(data.message);
+                localStorage.setItem('emailPendiente', correo);
+                ui.reg.style.display = 'none';
+                ui.ver.style.display = 'flex';
+            } else alert(data.error);
         };
-        document.getElementById('closeMenu').onclick = () => {
-            sideMenu.classList.remove('active');
-            document.getElementById('menuOverlay').classList.remove('show');
+
+        document.getElementById('btnConfirmarCodigo').onclick = async () => {
+            const res = await fetch('/verify', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ correo: localStorage.getItem('emailPendiente'), codigo: document.getElementById('inputCodigo').value })
+            });
+            if (res.ok) {
+                alert("Cuenta activa.");
+                ui.ver.style.display = 'none';
+                ui.log.style.display = 'flex';
+            } else alert("Código incorrecto.");
         };
+
+        document.getElementById('btnEntrarLogin').onclick = async () => {
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ correo: document.getElementById('loginUser').value, password: document.getElementById('loginPass').value })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
+                document.getElementById('profileCorreo').value = document.getElementById('loginUser').value;
+                ui.authModal.classList.remove('is-visible');
+            } else alert(data.error);
+        };
+
+        // CLOSE AUTH
+        document.getElementById('closeAuth').onclick = () => ui.authModal.classList.remove('is-visible');
+        document.getElementById('toggleLogin').onclick = () => { ui.reg.style.display='none'; ui.log.style.display='flex'; };
+        document.getElementById('toggleRegister').onclick = () => { ui.log.style.display='none'; ui.reg.style.display='flex'; };
     </script>
 </body>
 </html>
