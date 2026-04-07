@@ -26,16 +26,15 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// --- RUTA: REGISTRO + ENVÍO CÓDIGO ---
+// --- RUTAS DE USUARIO (REGISTRO, VERIFICAR, LOGIN, PERFIL) ---
+
 app.post('/register', (req, res) => {
     const { nombre, correo, password } = req.body;
     const codigo = Math.floor(100000 + Math.random() * 900000);
-
     const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol, verificado, codigo_verificacion) VALUES (?, ?, ?, 'usuario', 0, ?)";
     
     db.query(sql, [nombre, correo, password, codigo], (err) => {
         if (err) return res.status(500).json({ error: "El correo ya existe." });
-
         const mailOptions = {
             from: `"Valor Noble" <${process.env.EMAIL_USER}>`,
             to: correo,
@@ -45,7 +44,6 @@ app.post('/register', (req, res) => {
                     <p>Tu código de activación es: <b style="font-size:24px;">${codigo}</b></p>
                    </div>`
         };
-
         transporter.sendMail(mailOptions, (error) => {
             if (error) return res.json({ success: true, message: "Registrado. El correo falló. Código: " + codigo });
             res.json({ success: true, message: "Código enviado a tu correo." });
@@ -53,7 +51,6 @@ app.post('/register', (req, res) => {
     });
 });
 
-// --- RUTA: VERIFICAR ---
 app.post('/verify', (req, res) => {
     const { correo, codigo } = req.body;
     const sql = "UPDATE USUARIOS SET verificado = 1 WHERE Correo = ? AND codigo_verificacion = ?";
@@ -63,7 +60,6 @@ app.post('/verify', (req, res) => {
     });
 });
 
-// --- RUTA: LOGIN (CON JOIN A CLIENTES) ---
 app.post('/login', (req, res) => {
     const { correo, password } = req.body;
     const sql = `
@@ -74,14 +70,13 @@ app.post('/login', (req, res) => {
     
     db.query(sql, [correo, password], (err, results) => {
         if (err) return res.status(500).json({ error: "Error en el servidor" });
-        
         if (results.length > 0) {
             const user = results[0];
             if (user.verificado == 0) return res.status(403).json({ error: "Verifica tu cuenta primero." });
             res.json({ 
                 success: true,
                 user: { 
-                    id: user.Id_Usuario, // Crucial para finalizar compra
+                    id: user.Id_Usuario, 
                     nombre: user.Nombre, 
                     correo: user.Correo, 
                     rol: user.Rol,
@@ -93,15 +88,11 @@ app.post('/login', (req, res) => {
     });
 });
 
-// --- RUTA: ACTUALIZAR PERFIL ---
 app.post('/update-profile', (req, res) => {
     const { nombre, correo, telefono, direccion } = req.body;
-
     db.query("SELECT Id_Usuario FROM USUARIOS WHERE Correo = ?", [correo], (err, results) => {
         if (err || results.length === 0) return res.status(404).json({ error: "Usuario no encontrado" });
-
         const idU = results[0].Id_Usuario;
-
         db.query("SELECT Id_Cliente FROM CLIENTES WHERE Id_Usuario = ?", [idU], (err, clients) => {
             if (clients.length > 0) {
                 const sqlUpd = "UPDATE CLIENTES SET Nombre=?, Telefono=?, Direccion=?, Correo=? WHERE Id_Usuario=?";
@@ -120,50 +111,61 @@ app.post('/update-profile', (req, res) => {
     });
 });
 
-// --- RUTA: FINALIZAR COMPRA (NUEVA) ---
-app.post('/finalizar-compra', (req, res) => {
-    const { idUsuario, productos, subtotal, totalConIva } = req.body;
+// --- FLUJO DE VENTA Y PAGO ---
 
-    if (!productos || productos.length === 0) {
-        return res.status(400).json({ error: "El carrito está vacío." });
-    }
+// PASO 1: Preparar la venta (Se activa al dar clic en Finalizar Compra)
+app.post('/preparar-pago', (req, res) => {
+    const { idCliente, productos, subtotal } = req.body;
+    const iva = subtotal * 0.16;
+    const total = subtotal + iva;
+    const fechaActual = new Date();
 
-    // Insertamos los datos en la tabla CARTA_DE_COMPRAS
-    // Nota: El subtotal y total ya vienen calculados desde el frontend
-    const sql = "INSERT INTO CARTA_DE_COMPRAS (Id_Usuario, Cantidad, Subtotal, Total) VALUES ?";
+    // Insertar en tabla VENTAS [cite: 117, 132, 138, 144]
+    const sqlVenta = "INSERT INTO VENTAS (Id_Cliente, Fecha, Subtotal, Total, Estado) VALUES (?, ?, ?, ?, 'Esperando Pago')";
     
-    // Mapeamos los productos para obtener la cantidad total de artículos y montos
-    // Si tu tabla guarda cada producto por separado, la lógica cambiaría, 
-    // pero aquí guardamos el resumen del carrito como solicitaste.
-    const cantidadTotal = productos.reduce((acc, p) => acc + p.qty, 0);
-    const values = [[idUsuario, cantidadTotal, subtotal, totalConIva]];
+    db.query(sqlVenta, [idCliente, fechaActual, subtotal, total], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        const idVentaGenerada = result.insertId;
+        const referenciaUnica = `REF-${fechaActual.getFullYear()}-${idVentaGenerada}-${Math.floor(Math.random()*1000)}`;
 
-    db.query(sql, [values], (err, result) => {
-        if (err) {
-            console.error("❌ Error DB Compra:", err.message);
-            return res.status(500).json({ error: "Error al registrar la compra en la base de datos." });
-        }
-        res.json({ success: true, message: "Registro de compra guardado exitosamente." });
+        // Guardar detalle de la venta vinculando productos [cite: 108]
+        const detalleValues = productos.map(p => [idVentaGenerada, p.id, p.qty, p.price]);
+        const sqlDetalle = "INSERT INTO DETALLE_VENTA (Id_Venta, Id_Producto, Cantidad, Precio_Unitario) VALUES ?";
+
+        db.query(sqlDetalle, [detalleValues], (errDetalle) => {
+            if (errDetalle) return res.status(500).json({ error: "Error al guardar el detalle de la venta." });
+
+            res.json({
+                success: true,
+                idVenta: idVentaGenerada,
+                referencia: referenciaUnica,
+                montoTotal: total
+            });
+        });
     });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Servidor en puerto ${PORT}`));
-// --- RUTA: REGISTRAR PAGO DEL FORMULARIO ---
+// PASO 2: Registrar pago final desde el formulario
 app.post('/registrar-pago', (req, res) => {
     const { idVenta, referencia, metodoPago, monto } = req.body;
 
+    // Insertar en tabla PAGOS 
     const sqlPago = "INSERT INTO PAGOS (Id_Venta, Referencia_Pago, Metodo_Pago, Estado_Pago, Monto, Fecha) VALUES (?, ?, ?, 'Completado', ?, NOW())";
     
     db.query(sqlPago, [idVenta, referencia, metodoPago, monto], (err) => {
         if (err) return res.status(500).json({ error: "Error al registrar el pago" });
 
-        // Actualizar el estado de la venta [cite: 150]
+        // Actualizar el estado de la venta a 'Pagado' [cite: 150]
         db.query("UPDATE VENTAS SET Estado = 'Pagado' WHERE Id_Venta = ?", [idVenta]);
         
-        // Vaciar el carrito del usuario 
-        // db.query("DELETE FROM CARRITO_DE_COMPRAS WHERE Id_Usuario = ?", [idUsuario]);
+        // Opcional: Vaciar el registro del CARRITO DE COMPRAS en la BD [cite: 89]
+        // db.query("DELETE FROM CARRITO_DE_COMPRAS WHERE Id_Usuario = (SELECT Id_Cliente FROM VENTAS WHERE Id_Venta = ?)", [idVenta]);
 
-        res.json({ success: true, message: "Pago verificado y compra finalizada." });
+        res.json({ success: true, message: "Pago verificado y compra finalizada con éxito." });
     });
 });
+
+// --- INICIO DEL SERVIDOR ---
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Servidor en puerto ${PORT}`));
