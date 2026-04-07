@@ -79,7 +79,7 @@ app.post('/login', (req, res) => {
             res.json({ 
                 success: true,
                 user: { 
-                    id: usuario.Id_Usuario,
+                    
                     nombre: user.Nombre, correo: user.Correo, rol: user.Rol,
                     telefono: user.Telefono || '', direccion: user.Direccion || ''
                 } 
