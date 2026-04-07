@@ -68,14 +68,14 @@
                 <div class="title-underline"></div>
             </div>
             <div class="products-grid">
-                <div class="product-card">
+                <div class="product-card" style="cursor: pointer;">
                     <div class="product-image"><img src="./Imagenes/R.jpg" alt="P1"></div>
                     <div class="product-info">
                         <h3 class="product-name">Imagen prueba 1</h3>
                         <span class="price-current">$120.32</span>
                     </div>
                 </div>
-                <div class="product-card">
+                <div class="product-card" style="cursor: pointer;">
                     <div class="product-image"><img src="./Imagenes/1000_F_833778350_E3Tzhsn02OjQUJ8oltJBEU6874IQKxkI.jpg" alt="P2"></div>
                     <div class="product-info">
                         <h3 class="product-name">Imagen prueba 2</h3>
@@ -94,7 +94,7 @@
                 <div style="flex: 1; min-width: 300px;">
                     <h1 id="detailTitle"></h1>
                     <h2 id="detailPrice" style="color: #ff5722; margin-bottom: 20px;"></h2>
-                    <p style="color: #666; margin-bottom: 30px;">Descripción detallada de esta pieza única de Valor Noble.</p>
+                    <p>Descripción detallada de esta pieza única de Valor Noble.</p>
                     <button class="add-to-cart-btn" style="background: #8c9b8c; color: white; padding: 15px 40px; border: none; cursor: pointer; width: 100%; font-weight: bold;">Añadir al Carrito</button>
                 </div>
             </div>
@@ -120,7 +120,6 @@
     <div id="authInterface" class="auth-interface">
         <div class="auth-container single-column">
             <div id="closeAuth" class="close-auth">&#10006;</div>
-
             <div class="auth-column" id="registerView">
                 <h2 class="auth-title">Crear Cuenta</h2>
                 <div class="form-group"><input type="text" id="regNombre" class="form-input" placeholder="Nombre"></div>
@@ -129,14 +128,11 @@
                 <button class="auth-button" id="btnRegistrarFinal">Registrarse</button>
                 <div class="already-account">¿Ya tienes cuenta? <button id="toggleLogin" class="text-button">Login</button></div>
             </div>
-
             <div class="auth-column" id="verifyView" style="display: none;">
-                <h2 class="auth-title">Verifica tu Correo</h2>
-                <p style="text-align: center; margin-bottom: 15px; color: #666;">Ingresa el código enviado a tu email.</p>
+                <h2 class="auth-title">Verificar Código</h2>
                 <div class="form-group"><input type="text" id="inputCodigo" class="form-input" placeholder="6 dígitos"></div>
                 <button class="auth-button" id="btnConfirmarCodigo">Activar Cuenta</button>
             </div>
-
             <div class="auth-column" id="loginView" style="display: none;">
                 <h2 class="auth-title">Iniciar Sesión</h2>
                 <div class="form-group"><input type="text" id="loginUser" class="form-input" placeholder="Correo"></div>
@@ -148,7 +144,6 @@
     </div>
 
     <script>
-        // SELECTORES
         const ui = {
             store: document.getElementById('mainStoreView'),
             detail: document.getElementById('productDetailView'),
@@ -163,15 +158,15 @@
             overlayMenu: document.getElementById('menuOverlay')
         };
 
-        // NAVEGACIÓN (Protege paneles laterales)
+        // NAVEGACIÓN PROTEGIDA (No oculta sidebars)
         const showView = (viewName) => {
-            [ui.store, ui.detail, ui.profile].forEach(v => v.style.display = 'none');
+            const mainViews = [ui.store, ui.detail, ui.profile];
+            mainViews.forEach(v => v.style.display = 'none');
             ui[viewName].style.display = 'block';
             ui.authModal.classList.remove('is-visible');
             window.scrollTo(0,0);
         };
 
-        // PANELES LATERALES (Carrito / Menú)
         const closePanels = () => {
             ui.cart.classList.remove('open');
             ui.menu.classList.remove('active');
@@ -179,19 +174,26 @@
             ui.overlayMenu.classList.remove('show');
         };
 
+        // EVENTOS DE PANELES LATERALES
         document.getElementById('openCartBtn').onclick = () => { ui.cart.classList.add('open'); ui.overlayCart.classList.add('show'); };
         document.querySelector('.hamburger-menu').onclick = () => { ui.menu.classList.add('active'); ui.overlayMenu.classList.add('show'); };
-        [ui.overlayCart, ui.overlayMenu, document.getElementById('closeCart'), document.getElementById('closeMenu')].forEach(el => {
-            if(el) el.onclick = closePanels;
-        });
+        [ui.overlayCart, ui.overlayMenu, document.getElementById('closeCart'), document.getElementById('closeMenu')].forEach(el => el.onclick = closePanels);
 
-        // PERFIL
+        // LÓGICA DE PERFIL (CONSULTA DESDE SESIÓN)
         const abrirPerfil = (e) => {
             if(e) e.preventDefault();
             closePanels();
-            const nombreHeader = document.getElementById('userBtn').innerText.replace('Hola, ', '').trim();
-            document.getElementById('profileNombre').value = (nombreHeader === '👤') ? '' : nombreHeader;
-            showView('profile');
+            
+            const userSession = JSON.parse(sessionStorage.getItem('usuarioActive'));
+            if (userSession) {
+                document.getElementById('profileNombre').value = userSession.nombre;
+                document.getElementById('profileCorreo').value = userSession.correo;
+                document.getElementById('profileTelefono').value = userSession.telefono || '';
+                document.getElementById('profileDireccion').value = userSession.direccion || '';
+                showView('profile');
+            } else {
+                ui.authModal.classList.add('is-visible');
+            }
         };
 
         document.getElementById('menuMyAccount').onclick = abrirPerfil;
@@ -199,11 +201,74 @@
 
         // BOTÓN USUARIO HEADER
         document.getElementById('userBtn').onclick = (e) => {
-            if (document.getElementById('userBtn').innerText.includes('Hola')) abrirPerfil(e);
+            const label = document.getElementById('userBtn').innerText;
+            if (label.includes('Hola')) abrirPerfil(e);
             else ui.authModal.classList.add('is-visible');
         };
 
-        // PRODUCTOS
+        // LOGIN CON PERSISTENCIA
+        document.getElementById('btnEntrarLogin').onclick = async () => {
+            const correo = document.getElementById('loginUser').value;
+            const password = document.getElementById('loginPass').value;
+            try {
+                const res = await fetch('/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({correo, password})
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    sessionStorage.setItem('usuarioActive', JSON.stringify(data.user));
+                    document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
+                    ui.authModal.classList.remove('is-visible');
+                } else alert(data.error);
+            } catch (e) { alert("Error de conexión"); }
+        };
+
+        // GUARDAR PERFIL EN BD Y SESIÓN
+        document.getElementById('profileForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const datos = {
+                nombre: document.getElementById('profileNombre').value,
+                correo: document.getElementById('profileCorreo').value,
+                telefono: document.getElementById('profileTelefono').value,
+                direccion: document.getElementById('profileDireccion').value
+            };
+            try {
+                const res = await fetch('/update-profile', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(datos)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    sessionStorage.setItem('usuarioActive', JSON.stringify(datos));
+                    document.getElementById('userBtn').innerHTML = `<span>Hola, ${datos.nombre}</span>`;
+                    alert("✅ Perfil actualizado correctamente");
+                } else alert(data.error);
+            } catch (e) { alert("Error al guardar"); }
+        };
+
+        // OTROS EVENTOS
+        document.getElementById('btnRegistrarFinal').onclick = async () => {
+            const correo = document.getElementById('regCorreo').value;
+            const res = await fetch('/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ nombre: document.getElementById('regNombre').value, correo, password: document.getElementById('regPass').value })
+            });
+            if (res.ok) { localStorage.setItem('emailPendiente', correo); ui.reg.style.display = 'none'; ui.ver.style.display = 'flex'; }
+        };
+
+        document.getElementById('btnConfirmarCodigo').onclick = async () => {
+            const res = await fetch('/verify', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ correo: localStorage.getItem('emailPendiente'), codigo: document.getElementById('inputCodigo').value })
+            });
+            if (res.ok) { alert("Cuenta activada."); ui.ver.style.display = 'none'; ui.log.style.display = 'flex'; }
+        };
+
         document.querySelectorAll('.product-card').forEach(card => {
             card.onclick = () => {
                 document.getElementById('detailTitle').innerText = card.querySelector('.product-name').innerText;
@@ -213,67 +278,20 @@
             };
         });
         document.getElementById('btnBackToStore').onclick = () => showView('store');
-
-        // LÓGICA DE CARRITO (SIMULADA)
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('add-to-cart-btn')) {
-                const badge = document.getElementById('mainCartBadge');
-                const label = document.getElementById('cartCountLabel');
-                let count = parseInt(badge.innerText) + 1;
-                badge.innerText = count;
-                label.innerText = count;
-                alert("¡Añadido al carrito!");
-            }
-        });
-
-        // --- AUTH FETCHES ---
-        document.getElementById('btnRegistrarFinal').onclick = async () => {
-            const correo = document.getElementById('regCorreo').value;
-            const res = await fetch('/register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ nombre: document.getElementById('regNombre').value, correo, password: document.getElementById('regPass').value })
-            });
-            const data = await res.json();
-            if (res.ok || data.success) {
-                alert(data.message);
-                localStorage.setItem('emailPendiente', correo);
-                ui.reg.style.display = 'none';
-                ui.ver.style.display = 'flex';
-            } else alert(data.error);
-        };
-
-        document.getElementById('btnConfirmarCodigo').onclick = async () => {
-            const res = await fetch('/verify', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ correo: localStorage.getItem('emailPendiente'), codigo: document.getElementById('inputCodigo').value })
-            });
-            if (res.ok) {
-                alert("Cuenta activa.");
-                ui.ver.style.display = 'none';
-                ui.log.style.display = 'flex';
-            } else alert("Código incorrecto.");
-        };
-
-        document.getElementById('btnEntrarLogin').onclick = async () => {
-            const res = await fetch('/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ correo: document.getElementById('loginUser').value, password: document.getElementById('loginPass').value })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
-                document.getElementById('profileCorreo').value = document.getElementById('loginUser').value;
-                ui.authModal.classList.remove('is-visible');
-            } else alert(data.error);
-        };
-
-        // CLOSE AUTH
         document.getElementById('closeAuth').onclick = () => ui.authModal.classList.remove('is-visible');
         document.getElementById('toggleLogin').onclick = () => { ui.reg.style.display='none'; ui.log.style.display='flex'; };
         document.getElementById('toggleRegister').onclick = () => { ui.log.style.display='none'; ui.reg.style.display='flex'; };
+
+        // LOGOUT TOTAL
+        document.getElementById('menuLogout').onclick = (e) => {
+            e.preventDefault();
+            sessionStorage.clear();
+            localStorage.clear();
+            document.getElementById('userBtn').innerHTML = `&#128100;`;
+            closePanels();
+            showView('store');
+            alert("Sesión cerrada.");
+        };
     </script>
 </body>
 </html>
