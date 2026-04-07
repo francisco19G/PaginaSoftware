@@ -16,7 +16,6 @@
         <nav class="menu-links">
             <a href="#" id="menuMyAccount"><span class="menu-icon">👤</span> Mi cuenta</a>
             <a href="#"><span class="menu-icon">🛍️</span> Mis compras</a>
-            <a href="#"><span class="menu-icon">❓</span> Ayuda</a>
             <hr>
             <a href="#" id="menuLogout" style="color: #e74c3c;"><span class="menu-icon">🚪</span> Cerrar Sesión</a>
         </nav>
@@ -28,9 +27,7 @@
             <h3>Tu Carrito (<span id="cartCountLabel">0</span>)</h3>
             <span id="closeCart" class="close-cart-btn">&times;</span>
         </div>
-        <div id="cartItemsContainer" class="cart-items">
-            <div class="cart-empty-msg" style="text-align: center; margin-top: 50px; color: #888;">Tu carrito está vacío.</div>
-        </div>
+        <div id="cartItemsContainer" class="cart-items"></div>
         <div class="cart-footer">
             <div class="cart-total"><span>Total:</span> <span id="cartTotalPrice">$0.00</span></div>
             <button class="checkout-btn">Finalizar Compra</button>
@@ -63,40 +60,44 @@
 
     <main class="main-content" id="mainStoreView">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Nuestros Productos</h2>
-                <div class="title-underline"></div>
-            </div>
+            <div class="section-header"><h2 class="section-title">Nuestros Productos</h2></div>
             <div class="products-grid">
-                <div class="product-card" style="cursor: pointer;">
-                    <div class="product-image"><img src="./Imagenes/R.jpg" alt="P1"></div>
-                    <div class="product-info">
-                        <h3 class="product-name">Imagen prueba 1</h3>
-                        <span class="price-current">$120.32</span>
-                    </div>
+                <div class="product-card" data-id="1" style="cursor: pointer;">
+                    <div class="product-image"><img src="./Imagenes/R.jpg"></div>
+                    <div class="product-info"><h3 class="product-name">Imagen prueba 1</h3><span class="price-current">$120.32</span></div>
                 </div>
-                <div class="product-card" style="cursor: pointer;">
-                    <div class="product-image"><img src="./Imagenes/1000_F_833778350_E3Tzhsn02OjQUJ8oltJBEU6874IQKxkI.jpg" alt="P2"></div>
-                    <div class="product-info">
-                        <h3 class="product-name">Imagen prueba 2</h3>
-                        <span class="price-current">$65.86</span>
-                    </div>
+                <div class="product-card" data-id="2" style="cursor: pointer;">
+                    <div class="product-image"><img src="./Imagenes/1000_F_833778350_E3Tzhsn02OjQUJ8oltJBEU6874IQKxkI.jpg"></div>
+                    <div class="product-info"><h3 class="product-name">Imagen prueba 2</h3><span class="price-current">$65.86</span></div>
                 </div>
             </div>
         </div>
     </main>
 
-    <div id="productDetailView" style="display: none; padding: 50px 0;">
-        <div class="container">
-            <button id="btnBackToStore">← Volver</button>
-            <div style="display: flex; gap: 40px; margin-top: 20px; flex-wrap: wrap;">
-                <img id="detailMainImg" src="" style="width: 100%; max-width: 400px; border-radius: 8px;">
-                <div style="flex: 1; min-width: 300px;">
-                    <h1 id="detailTitle"></h1>
-                    <h2 id="detailPrice" style="color: #ff5722; margin-bottom: 20px;"></h2>
-                    <p>Descripción detallada de esta pieza única de Valor Noble.</p>
-                    <button class="add-to-cart-btn" style="background: #8c9b8c; color: white; padding: 15px 40px; border: none; cursor: pointer; width: 100%; font-weight: bold;">Añadir al Carrito</button>
+    <div id="paymentModal" class="auth-interface">
+        <div class="auth-container single-column" style="max-width: 500px;">
+            <div id="closePayment" class="close-auth">&#10006;</div>
+            <div class="auth-column">
+                <h2 class="auth-title">Finalizar Pago</h2>
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #8c9b8c;">
+                    <p style="margin: 0; font-size: 14px; color: #666;">Referencia de Operación Única:</p>
+                    <h3 id="paymentRef" style="margin: 5px 0; color: #2F2A26;">---</h3>
+                    <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">Total a Pagar (IVA 16% inc.):</p>
+                    <h3 id="paymentAmount" style="margin: 5px 0; color: #ff5722;">$0.00</h3>
                 </div>
+
+                <form id="paymentForm">
+                    <div class="form-group">
+                        <label>Método de Pago</label>
+                        <select id="payMethod" class="form-input" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="Tarjeta de Crédito/Débito">Tarjeta de Crédito/Débito</option>
+                            <option value="Transferencia SPEI">Transferencia SPEI</option>
+                            <option value="Efectivo (OXXO)">Efectivo (OXXO)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="auth-button" style="background: #2F2A26; margin-top: 20px;">Confirmar Pago</button>
+                </form>
             </div>
         </div>
     </div>
@@ -105,13 +106,13 @@
         <div class="container">
             <button id="btnBackFromProfile">← Volver</button>
             <div class="profile-card" style="max-width: 500px; margin: 40px auto; padding: 30px; border: 1px solid #ddd; background: #fff; border-radius: 8px;">
-                <h2 style="border-bottom: 2px solid #8c9b8c; padding-bottom: 10px; margin-bottom: 20px;">Mi Perfil</h2>
+                <h2>Mi Perfil</h2>
                 <form id="profileForm">
                     <div class="form-group"><label>Nombre</label><input type="text" id="profileNombre" class="form-input"></div>
-                    <div class="form-group"><label>Correo</label><input type="email" id="profileCorreo" class="form-input" readonly style="background: #eee;"></div>
-                    <div class="form-group"><label>Teléfono</label><input type="tel" id="profileTelefono" class="form-input" placeholder="Tu teléfono"></div>
-                    <div class="form-group"><label>Dirección</label><textarea id="profileDireccion" class="form-input" placeholder="Dirección de envío"></textarea></div>
-                    <button type="submit" class="auth-button" style="width: 100%; background: #2F2A26;">Guardar Cambios</button>
+                    <div class="form-group"><label>Correo</label><input type="email" id="profileCorreo" class="form-input" readonly></div>
+                    <div class="form-group"><label>Teléfono</label><input type="tel" id="profileTelefono" class="form-input"></div>
+                    <div class="form-group"><label>Dirección</label><textarea id="profileDireccion" class="form-input"></textarea></div>
+                    <button type="submit" class="auth-button">Guardar Cambios</button>
                 </form>
             </div>
         </div>
@@ -120,66 +121,33 @@
     <div id="authInterface" class="auth-interface">
         <div class="auth-container single-column">
             <div id="closeAuth" class="close-auth">&#10006;</div>
-            <div class="auth-column" id="registerView">
+            <div id="registerView" class="auth-column">
                 <h2 class="auth-title">Crear Cuenta</h2>
-                <div class="form-group"><input type="text" id="regNombre" class="form-input" placeholder="Nombre"></div>
-                <div class="form-group"><input type="email" id="regCorreo" class="form-input" placeholder="Correo"></div>
-                <div class="form-group"><input type="password" id="regPass" class="form-input" placeholder="Contraseña"></div>
+                <input type="text" id="regNombre" class="form-input" placeholder="Nombre">
+                <input type="email" id="regCorreo" class="form-input" placeholder="Correo">
+                <input type="password" id="regPass" class="form-input" placeholder="Contraseña">
                 <button class="auth-button" id="btnRegistrarFinal">Registrarse</button>
                 <div class="already-account">¿Ya tienes cuenta? <button id="toggleLogin" class="text-button">Login</button></div>
             </div>
-            <div class="auth-column" id="verifyView" style="display: none;">
-                <h2 class="auth-title">Verificar Código</h2>
-                <div class="form-group"><input type="text" id="inputCodigo" class="form-input" placeholder="6 dígitos"></div>
-                <button class="auth-button" id="btnConfirmarCodigo">Activar Cuenta</button>
-            </div>
-            <div class="auth-column" id="loginView" style="display: none;">
+            <div id="loginView" class="auth-column" style="display: none;">
                 <h2 class="auth-title">Iniciar Sesión</h2>
-                <div class="form-group"><input type="text" id="loginUser" class="form-input" placeholder="Correo"></div>
-                <div class="form-group"><input type="password" id="loginPass" class="form-input" placeholder="Contraseña"></div>
+                <input type="text" id="loginUser" class="form-input" placeholder="Correo">
+                <input type="password" id="loginPass" class="form-input" placeholder="Contraseña">
                 <button class="auth-button" id="btnEntrarLogin">Entrar</button>
                 <div class="already-account">¿No tienes cuenta? <button id="toggleRegister" class="text-button">Registro</button></div>
             </div>
         </div>
     </div>
-    <div id="paymentModal" class="auth-interface">
-    <div class="auth-container single-column" style="max-width: 500px;">
-        <div id="closePayment" class="close-auth">&#10006;</div>
-        <div class="auth-column">
-            <h2 class="auth-title">Finalizar Pago</h2>
-            <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #8c9b8c;">
-                <p style="margin: 0; font-size: 14px; color: #666;">Referencia de Operación:</p>
-                <h3 id="paymentRef" style="margin: 5px 0; color: #2F2A26;">---</h3>
-                <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">Total a Pagar (IVA 16% inc.):</p>
-                <h3 id="paymentAmount" style="margin: 5px 0; color: #ff5722;">$0.00</h3>
-            </div>
 
-            <form id="paymentForm">
-                <div class="form-group">
-                    <label style="display:block; margin-bottom:5px; font-weight:bold;">Método de Pago</label>
-                    <select id="payMethod" class="form-input" required>
-                        <option value="">Selecciona una opción</option>
-                        <option value="Tarjeta de Crédito/Débito">Tarjeta de Crédito/Débito</option>
-                        <option value="Transferencia SPEI">Transferencia SPEI</option>
-                        <option value="PayPal">PayPal</option>
-                        <option value="Efectivo (OXXO)">Efectivo (OXXO)</option>
-                    </select>
-                </div>
-                
-                <div id="cardDetails" style="display:none;">
-                    <div class="form-group"><input type="text" class="form-input" placeholder="Nombre en la tarjeta"></div>
-                    <div class="form-group"><input type="text" class="form-input" placeholder="Número de tarjeta"></div>
-                    <div style="display:flex; gap:10px;">
-                        <input type="text" class="form-input" placeholder="MM/AA" style="flex:1;">
-                        <input type="text" class="form-input" placeholder="CVV" style="flex:1;">
-                    </div>
-                </div>
-
-                <button type="submit" class="auth-button" style="background: #2F2A26; margin-top: 20px;">Confirmar Pago</button>
-            </form>
+    <div id="productDetailView" style="display: none; padding: 50px 0;">
+        <div class="container">
+            <button id="btnBackToStore">← Volver</button>
+            <h1 id="detailTitle"></h1>
+            <h2 id="detailPrice"></h2>
+            <img id="detailMainImg" src="" style="width: 200px;">
+            <button class="add-to-cart-btn">Añadir al Carrito</button>
         </div>
     </div>
-</div>
 
 <script>
     const ui = {
@@ -187,19 +155,17 @@
         detail: document.getElementById('productDetailView'),
         profile: document.getElementById('userProfileView'),
         authModal: document.getElementById('authInterface'),
+        payModal: document.getElementById('paymentModal'),
         reg: document.getElementById('registerView'),
         log: document.getElementById('loginView'),
-        ver: document.getElementById('verifyView'),
         cart: document.getElementById('cartSidebar'),
         menu: document.getElementById('sideMenu'),
         overlayCart: document.getElementById('cartOverlay'),
         overlayMenu: document.getElementById('menuOverlay')
     };
 
-    // --- NAVEGACIÓN ---
     const showView = (viewName) => {
-        const mainViews = [ui.store, ui.detail, ui.profile];
-        mainViews.forEach(v => v.style.display = 'none');
+        [ui.store, ui.detail, ui.profile].forEach(v => v.style.display = 'none');
         ui[viewName].style.display = 'block';
         ui.authModal.classList.remove('is-visible');
         window.scrollTo(0,0);
@@ -212,257 +178,118 @@
         ui.overlayMenu.classList.remove('show');
     };
 
-    // EVENTOS DE PANELES
+    // EVENTOS BÁSICOS
     document.getElementById('openCartBtn').onclick = () => { ui.cart.classList.add('open'); ui.overlayCart.classList.add('show'); };
     document.querySelector('.hamburger-menu').onclick = () => { ui.menu.classList.add('active'); ui.overlayMenu.classList.add('show'); };
-    [ui.overlayCart, ui.overlayMenu, document.getElementById('closeCart'), document.getElementById('closeMenu')].forEach(el => el.onclick = closePanels);
-
-    // --- PERFIL ---
-    const abrirPerfil = (e) => {
-        if(e) e.preventDefault();
-        closePanels();
-        const rawData = sessionStorage.getItem('usuarioActive');
-        if (rawData) {
-            const userSession = JSON.parse(rawData);
-            document.getElementById('profileNombre').value = userSession.nombre || '';
-            document.getElementById('profileCorreo').value = userSession.correo || '';
-            document.getElementById('profileTelefono').value = userSession.telefono || '';
-            document.getElementById('profileDireccion').value = userSession.direccion || '';
-            showView('profile');
-        } else {
-            ui.authModal.classList.add('is-visible');
-        }
-    };
-
-    document.getElementById('menuMyAccount').onclick = abrirPerfil;
-    document.getElementById('btnBackFromProfile').onclick = () => showView('store');
-
-    document.getElementById('userBtn').onclick = (e) => {
-        const label = document.getElementById('userBtn').innerText;
-        if (label.includes('Hola')) abrirPerfil(e);
-        else ui.authModal.classList.add('is-visible');
-    };
-
-    // --- LOGIN ---
-    document.getElementById('btnEntrarLogin').onclick = async () => {
-        const correo = document.getElementById('loginUser').value;
-        const password = document.getElementById('loginPass').value;
-        try {
-            const res = await fetch('/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({correo, password})
-            });
-            const data = await res.json();
-            if (res.ok) {
-                // Importante: El servidor debe enviar 'id' en data.user
-                sessionStorage.setItem('usuarioActive', JSON.stringify(data.user));
-                document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
-                ui.authModal.classList.remove('is-visible');
-                alert("¡Bienvenido!");
-            } else alert(data.error);
-        } catch (e) { alert("Error de conexión"); }
-    };
-
-    // --- GUARDAR PERFIL ---
-    document.getElementById('profileForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const currentSession = JSON.parse(sessionStorage.getItem('usuarioActive'));
-        const datosActualizados = {
-            nombre: document.getElementById('profileNombre').value,
-            correo: document.getElementById('profileCorreo').value,
-            telefono: document.getElementById('profileTelefono').value,
-            direccion: document.getElementById('profileDireccion').value,
-            rol: currentSession ? currentSession.rol : 'usuario'
-        };
-        try {
-            const res = await fetch('/update-profile', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(datosActualizados)
-            });
-            if (res.ok) {
-                sessionStorage.setItem('usuarioActive', JSON.stringify({...currentSession, ...datosActualizados}));
-                alert("✅ Perfil actualizado correctamente");
-            }
-        } catch (e) { alert("Error al guardar"); }
-    };
+    [ui.overlayCart, ui.overlayMenu, document.getElementById('closeCart'), document.getElementById('closeMenu'), document.getElementById('closePayment')].forEach(el => {
+        if(el) el.onclick = closePanels;
+    });
 
     // --- SISTEMA DE CARRITO ---
     let cart = JSON.parse(localStorage.getItem('cartData')) || [];
 
     const updateCartUI = () => {
         const container = document.getElementById('cartItemsContainer');
-        const badge = document.getElementById('mainCartBadge');
-        const label = document.getElementById('cartCountLabel');
-        const totalDisplay = document.getElementById('cartTotalPrice');
-        
-        container.innerHTML = '';
         let subtotal = 0;
         let count = 0;
-
-        if (cart.length === 0) {
-            container.innerHTML = '<div class="cart-empty-msg" style="text-align:center; margin-top:50px; color:#888;">Tu carrito está vacío.</div>';
-        } else {
-            cart.forEach((item, index) => {
-                subtotal += item.price * item.qty;
-                count += item.qty;
-                container.innerHTML += `
-                    <div class="cart-item" style="display:flex; align-items:center; gap:10px; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                        <img src="${item.img}" style="width:50px; height:50px; object-fit:cover;">
-                        <div style="flex:1;">
-                            <h4 style="margin:0; font-size:14px;">${item.name}</h4>
-                            <p style="margin:0; font-size:12px;">$${item.price.toFixed(2)} x ${item.qty}</p>
-                            <div style="display:flex; gap:5px; margin-top:5px;">
-                                <button onclick="changeQty(${index}, -1)">-</button>
-                                <button onclick="changeQty(${index}, 1)">+</button>
-                                <button onclick="removeItem(${index})" style="color:red; background:none; border:none; margin-left:10px; cursor:pointer;">Eliminar</button>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-        }
-        badge.innerText = count;
-        label.innerText = count;
-        totalDisplay.innerText = `$${subtotal.toFixed(2)}`;
+        container.innerHTML = '';
+        cart.forEach((item) => {
+            subtotal += item.price * item.qty;
+            count += item.qty;
+            container.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">${item.name} - $${item.price} x ${item.qty}</div>`;
+        });
+        document.getElementById('mainCartBadge').innerText = count;
+        document.getElementById('cartCountLabel').innerText = count;
+        document.getElementById('cartTotalPrice').innerText = `$${subtotal.toFixed(2)}`;
         localStorage.setItem('cartData', JSON.stringify(cart));
     };
 
-    window.changeQty = (index, delta) => {
-        cart[index].qty += delta;
-        if (cart[index].qty < 1) return removeItem(index);
-        updateCartUI();
+    // --- AUTH ---
+    document.getElementById('btnRegistrarFinal').onclick = async () => {
+        const datos = { nombre: document.getElementById('regNombre').value, correo: document.getElementById('regCorreo').value, password: document.getElementById('regPass').value };
+        const res = await fetch('/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(datos)});
+        if (res.ok) { alert("Registro exitoso. Ya puedes iniciar sesión."); ui.reg.style.display = 'none'; ui.log.style.display = 'block'; }
     };
 
-    window.removeItem = (index) => {
-        cart.splice(index, 1);
-        updateCartUI();
+    document.getElementById('btnEntrarLogin').onclick = async () => {
+        const res = await fetch('/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({correo: document.getElementById('loginUser').value, password: document.getElementById('loginPass').value})});
+        const data = await res.json();
+        if (res.ok) {
+            sessionStorage.setItem('usuarioActive', JSON.stringify(data.user));
+            document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
+            ui.authModal.classList.remove('is-visible');
+        } else alert(data.error);
     };
 
-    document.getElementById('clearCart').onclick = () => {
-        if(confirm("¿Vaciar el carrito?")) { cart = []; updateCartUI(); }
-    };
-
-    // --- FINALIZAR COMPRA ---
+    // --- PROCESO DE COMPRA ---
     document.querySelector('.checkout-btn').onclick = async () => {
-        const userSession = JSON.parse(sessionStorage.getItem('usuarioActive'));
-        
-        if (!userSession || !userSession.id) {
-            alert("Inicia sesión para finalizar tu compra.");
-            ui.authModal.classList.add('is-visible');
-            return;
+        const user = JSON.parse(sessionStorage.getItem('usuarioActive'));
+        if (!user || !user.id) { ui.authModal.classList.add('is-visible'); return; }
+        if (cart.length === 0) return alert("Carrito vacío");
+
+        const subtotal = cart.reduce((acc, p) => acc + (p.price * p.qty), 0);
+
+        const res = await fetch('/preparar-pago', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idCliente: user.id, productos: cart, subtotal })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            document.getElementById('paymentRef').innerText = data.referencia;
+            document.getElementById('paymentAmount').innerText = `$${data.montoTotal.toFixed(2)}`;
+            const form = document.getElementById('paymentForm');
+            form.dataset.idVenta = data.idVenta;
+            form.dataset.referencia = data.referencia;
+            form.dataset.monto = data.montoTotal;
+            closePanels();
+            ui.payModal.classList.add('is-visible');
         }
-
-        if (cart.length === 0) return alert("Tu carrito está vacío.");
-
-        let subtotal = cart.reduce((acc, p) => acc + (p.price * p.qty), 0);
-        let totalConIva = subtotal * 1.16;
-
-        const payload = {
-            idUsuario: userSession.id,
-            productos: cart,
-            subtotal: subtotal,
-            totalConIva: totalConIva
-        };
-
-        try {
-            const res = await fetch('/finalizar-compra', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert(`✅ ${data.message}\nTotal (IVA 16%): $${totalConIva.toFixed(2)}`);
-                cart = [];
-                updateCartUI();
-                closePanels();
-            } else {
-                alert("Error: " + data.error);
-            }
-        } catch (e) { alert("Error de conexión con el servidor."); }
     };
 
-    // --- OTROS EVENTOS ---
+    document.getElementById('paymentForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const res = await fetch('/registrar-pago', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idVenta: form.dataset.idVenta, referencia: form.dataset.referencia, metodoPago: document.getElementById('payMethod').value, monto: form.dataset.monto })
+        });
+        if (res.ok) { alert("✅ Pago Exitoso. ¡Gracias!"); cart = []; updateCartUI(); ui.payModal.classList.remove('is-visible'); showView('store'); }
+    };
+
+    // PRODUCTOS
     document.querySelectorAll('.product-card').forEach(card => {
         card.onclick = () => {
             document.getElementById('detailTitle').innerText = card.querySelector('.product-name').innerText;
             document.getElementById('detailPrice').innerText = card.querySelector('.price-current').innerText;
             document.getElementById('detailMainImg').src = card.querySelector('img').src;
+            document.querySelector('.add-to-cart-btn').dataset.id = card.dataset.id;
             showView('detail');
         };
     });
 
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('add-to-cart-btn')) {
-            const name = document.getElementById('detailTitle').innerText;
-            const price = parseFloat(document.getElementById('detailPrice').innerText.replace('$', ''));
-            const img = document.getElementById('detailMainImg').src;
-            const existingItem = cart.find(item => item.name === name);
-            if (existingItem) existingItem.qty++;
-            else cart.push({ name, price, img, qty: 1 });
-            alert("¡Añadido!");
-            updateCartUI();
-        }
-    });
-
-    document.getElementById('btnBackToStore').onclick = () => showView('store');
-    document.getElementById('closeAuth').onclick = () => ui.authModal.classList.remove('is-visible');
-    document.getElementById('toggleLogin').onclick = () => { ui.reg.style.display='none'; ui.log.style.display='flex'; };
-    document.getElementById('toggleRegister').onclick = () => { ui.log.style.display='none'; ui.reg.style.display='flex'; };
-
-    document.getElementById('menuLogout').onclick = (e) => {
-        e.preventDefault();
-        sessionStorage.clear();
-        document.getElementById('userBtn').innerHTML = `&#128100;`;
-        closePanels();
-        showView('store');
-        alert("Sesión cerrada.");
+    document.querySelector('.add-to-cart-btn').onclick = function() {
+        cart.push({ id: this.dataset.id, name: document.getElementById('detailTitle').innerText, price: parseFloat(document.getElementById('detailPrice').innerText.replace('$','')), qty: 1 });
+        alert("Añadido");
+        updateCartUI();
     };
 
-    // Inicialización
+    document.getElementById('toggleLogin').onclick = () => { ui.reg.style.display='none'; ui.log.style.display='block'; };
+    document.getElementById('toggleRegister').onclick = () => { ui.log.style.display='none'; ui.reg.style.display='block'; };
+    document.getElementById('closeAuth').onclick = () => ui.authModal.classList.remove('is-visible');
+    document.getElementById('userBtn').onclick = () => {
+        const user = sessionStorage.getItem('usuarioActive');
+        if (user) {
+            const u = JSON.parse(user);
+            document.getElementById('profileNombre').value = u.nombre;
+            document.getElementById('profileCorreo').value = u.correo;
+            showView('profile');
+        } else ui.authModal.classList.add('is-visible');
+    };
+
     updateCartUI();
-
-    // --- RUTA: PROCESAR VENTA Y PREPARAR PAGO ---
-app.post('/preparar-pago', (req, res) => {
-    const { idUsuario, idCliente, productos, subtotal } = req.body;
-    
-    // 1. Calcular IVA (16%) y Total
-    const iva = subtotal * 0.16;
-    const total = subtotal + iva;
-    const fechaActual = new Date();
-
-    // 2. Insertar en tabla VENTAS 
-    const sqlVenta = "INSERT INTO VENTAS (Id_Cliente, Fecha, Subtotal, Total, Estado) VALUES (?, ?, ?, ?, 'Esperando Pago')";
-    
-    db.query(sqlVenta, [idCliente, fechaActual, subtotal, total], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
-        
-        const idVentaGenerada = result.insertId;
-        
-        // 3. Generar Referencia Única para este pago
-        // Formato: V-[Año]-[ID Venta]-[Random]
-        const referenciaUnica = `REF-${fechaActual.getFullYear()}-${idVentaGenerada}-${Math.floor(Math.random()*1000)}`;
-
-        // 4. Mapear productos del carrito al detalle de la venta
-        const detalleValues = productos.map(p => [idVentaGenerada, p.id_prod, p.qty, p.price]);
-        const sqlDetalle = "INSERT INTO DETALLE_VENTA (Id_Venta, Id_Producto, Cantidad, Precio_Unitario) VALUES ?";
-
-        db.query(sqlDetalle, [detalleValues], (errDetalle) => {
-            if (errDetalle) return res.status(500).json({ error: "Error al guardar detalle" });
-
-            // 5. Devolver la referencia y el ID de venta para el formulario de pago
-            res.json({
-                success: true,
-                idVenta: idVentaGenerada,
-                referencia: referenciaUnica,
-                montoTotal: total,
-                message: "Venta preparada. Proceda al formulario de pago."
-            });
-        });
-    });
-});
 </script>
-
 </body>
 </html>
