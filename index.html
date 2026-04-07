@@ -384,6 +384,46 @@
 
     // Inicialización
     updateCartUI();
+
+    // --- RUTA: PROCESAR VENTA Y PREPARAR PAGO ---
+app.post('/preparar-pago', (req, res) => {
+    const { idUsuario, idCliente, productos, subtotal } = req.body;
+    
+    // 1. Calcular IVA (16%) y Total
+    const iva = subtotal * 0.16;
+    const total = subtotal + iva;
+    const fechaActual = new Date();
+
+    // 2. Insertar en tabla VENTAS 
+    const sqlVenta = "INSERT INTO VENTAS (Id_Cliente, Fecha, Subtotal, Total, Estado) VALUES (?, ?, ?, ?, 'Esperando Pago')";
+    
+    db.query(sqlVenta, [idCliente, fechaActual, subtotal, total], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        const idVentaGenerada = result.insertId;
+        
+        // 3. Generar Referencia Única para este pago
+        // Formato: V-[Año]-[ID Venta]-[Random]
+        const referenciaUnica = `REF-${fechaActual.getFullYear()}-${idVentaGenerada}-${Math.floor(Math.random()*1000)}`;
+
+        // 4. Mapear productos del carrito al detalle de la venta
+        const detalleValues = productos.map(p => [idVentaGenerada, p.id_prod, p.qty, p.price]);
+        const sqlDetalle = "INSERT INTO DETALLE_VENTA (Id_Venta, Id_Producto, Cantidad, Precio_Unitario) VALUES ?";
+
+        db.query(sqlDetalle, [detalleValues], (errDetalle) => {
+            if (errDetalle) return res.status(500).json({ error: "Error al guardar detalle" });
+
+            // 5. Devolver la referencia y el ID de venta para el formulario de pago
+            res.json({
+                success: true,
+                idVenta: idVentaGenerada,
+                referencia: referenciaUnica,
+                montoTotal: total,
+                message: "Venta preparada. Proceda al formulario de pago."
+            });
+        });
+    });
+});
 </script>
 
 </body>

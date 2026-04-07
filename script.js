@@ -149,3 +149,21 @@ app.post('/finalizar-compra', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Servidor en puerto ${PORT}`));
+// --- RUTA: REGISTRAR PAGO DEL FORMULARIO ---
+app.post('/registrar-pago', (req, res) => {
+    const { idVenta, referencia, metodoPago, monto } = req.body;
+
+    const sqlPago = "INSERT INTO PAGOS (Id_Venta, Referencia_Pago, Metodo_Pago, Estado_Pago, Monto, Fecha) VALUES (?, ?, ?, 'Completado', ?, NOW())";
+    
+    db.query(sqlPago, [idVenta, referencia, metodoPago, monto], (err) => {
+        if (err) return res.status(500).json({ error: "Error al registrar el pago" });
+
+        // Actualizar el estado de la venta [cite: 150]
+        db.query("UPDATE VENTAS SET Estado = 'Pagado' WHERE Id_Venta = ?", [idVenta]);
+        
+        // Vaciar el carrito del usuario 
+        // db.query("DELETE FROM CARRITO_DE_COMPRAS WHERE Id_Usuario = ?", [idUsuario]);
+
+        res.json({ success: true, message: "Pago verificado y compra finalizada." });
+    });
+});
