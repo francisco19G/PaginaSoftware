@@ -762,3 +762,46 @@ body {
 .menu-links a:hover {
     background: #f1f1f1;
 }
+/* Elementos individuales dentro del carrito */
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.cart-item-info { flex-grow: 1; }
+
+.cart-item-info h4 { font-size: 0.9rem; margin: 0; color: #2F2A26; }
+
+.cart-item-qty {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.cart-item-qty button {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+.remove-item {
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-decoration: underline;
+    margin-top: 5px;
+    display: block;
+}
