@@ -404,7 +404,37 @@ document.getElementById('clearCart').onclick = () => {
 
 // Cargar carrito al iniciar la página
 updateCartUI();
+// --- RUTA: FINALIZAR COMPRA ---
+app.post('/finalizar-compra', (req, res) => {
+    const { idUsuario, productos, subtotal, totalConIva } = req.body;
 
+    if (!productos || productos.length === 0) {
+        return res.status(400).json({ error: "El carrito está vacío." });
+    }
+
+    // Preparamos los valores para una inserción múltiple
+    // Estructura: (Id_Usuario, Cantidad, Subtotal, Total)
+    // Nota: El ID de carta de compras suele ser AutoIncrement en la DB
+    const sql = "INSERT INTO CARTA_DE_COMPRAS (Id_Usuario, Cantidad, Subtotal, Total) VALUES ?";
+    
+    // Mapeamos los productos para que coincidan con las columnas de tu tabla
+    const values = productos.map(p => [
+        idUsuario, 
+        p.qty, 
+        p.price * p.qty, // Subtotal por ese tipo de producto
+        (p.price * p.qty) * 1.16 // Total con el 16% de IVA incluido
+    ]);
+
+    db.query(sql, [values], (err, result) => {
+        if (err) {
+            console.error("❌ Error al registrar compra:", err.sqlMessage);
+            return res.status(500).json({ error: "No se pudo guardar el registro de compra." });
+        }
+
+        console.log(`✅ Compra registrada para el usuario ${idUsuario}`);
+        res.json({ success: true, message: "¡Compra finalizada con éxito!" });
+    });
+});
 </script>
 </body>
 </html>

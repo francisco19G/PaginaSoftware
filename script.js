@@ -58,7 +58,7 @@ app.post('/verify', (req, res) => {
     const { correo, codigo } = req.body;
     const sql = "UPDATE USUARIOS SET verificado = 1 WHERE Correo = ? AND codigo_verificacion = ?";
     db.query(sql, [correo, codigo], (err, result) => {
-        if (result.affectedRows > 0) res.json({ success: true, message: "Cuenta activada." });
+        if (result && result.affectedRows > 0) res.json({ success: true, message: "Cuenta activada." });
         else res.status(400).json({ error: "Código incorrecto." });
     });
 });
@@ -73,15 +73,20 @@ app.post('/login', (req, res) => {
         WHERE U.Correo = ? AND U.Contrasena = ?`;
     
     db.query(sql, [correo, password], (err, results) => {
+        if (err) return res.status(500).json({ error: "Error en el servidor" });
+        
         if (results.length > 0) {
             const user = results[0];
             if (user.verificado == 0) return res.status(403).json({ error: "Verifica tu cuenta primero." });
             res.json({ 
                 success: true,
                 user: { 
-                    
-                    nombre: user.Nombre, correo: user.Correo, rol: user.Rol,
-                    telefono: user.Telefono || '', direccion: user.Direccion || ''
+                    id: user.Id_Usuario, // Crucial para finalizar compra
+                    nombre: user.Nombre, 
+                    correo: user.Correo, 
+                    rol: user.Rol,
+                    telefono: user.Telefono || '', 
+                    direccion: user.Direccion || ''
                 } 
             });
         } else res.status(401).json({ error: "Credenciales inválidas." });
@@ -89,27 +94,22 @@ app.post('/login', (req, res) => {
 });
 
 // --- RUTA: ACTUALIZAR PERFIL ---
-// --- RUTA: ACTUALIZAR PERFIL CORREGIDA ---
 app.post('/update-profile', (req, res) => {
     const { nombre, correo, telefono, direccion } = req.body;
 
-    // Buscamos el ID
     db.query("SELECT Id_Usuario FROM USUARIOS WHERE Correo = ?", [correo], (err, results) => {
         if (err || results.length === 0) return res.status(404).json({ error: "Usuario no encontrado" });
 
         const idU = results[0].Id_Usuario;
 
-        // Intentamos actualizar CLIENTES
         db.query("SELECT Id_Cliente FROM CLIENTES WHERE Id_Usuario = ?", [idU], (err, clients) => {
             if (clients.length > 0) {
-                // UPDATE
                 const sqlUpd = "UPDATE CLIENTES SET Nombre=?, Telefono=?, Direccion=?, Correo=? WHERE Id_Usuario=?";
                 db.query(sqlUpd, [nombre, telefono, direccion, correo, idU], (err) => {
                     if (err) return res.status(500).json({ error: "Error al actualizar" });
                     res.json({ success: true, message: "Perfil actualizado" });
                 });
             } else {
-                // INSERT
                 const sqlIns = "INSERT INTO CLIENTES (Id_Usuario, Nombre, Correo, Telefono, Direccion) VALUES (?,?,?,?,?)";
                 db.query(sqlIns, [idU, nombre, correo, telefono, direccion], (err) => {
                     if (err) return res.status(500).json({ error: "Error al crear perfil" });
@@ -117,6 +117,33 @@ app.post('/update-profile', (req, res) => {
                 });
             }
         });
+    });
+});
+
+// --- RUTA: FINALIZAR COMPRA (NUEVA) ---
+app.post('/finalizar-compra', (req, res) => {
+    const { idUsuario, productos, subtotal, totalConIva } = req.body;
+
+    if (!productos || productos.length === 0) {
+        return res.status(400).json({ error: "El carrito está vacío." });
+    }
+
+    // Insertamos los datos en la tabla CARTA_DE_COMPRAS
+    // Nota: El subtotal y total ya vienen calculados desde el frontend
+    const sql = "INSERT INTO CARTA_DE_COMPRAS (Id_Usuario, Cantidad, Subtotal, Total) VALUES ?";
+    
+    // Mapeamos los productos para obtener la cantidad total de artículos y montos
+    // Si tu tabla guarda cada producto por separado, la lógica cambiaría, 
+    // pero aquí guardamos el resumen del carrito como solicitaste.
+    const cantidadTotal = productos.reduce((acc, p) => acc + p.qty, 0);
+    const values = [[idUsuario, cantidadTotal, subtotal, totalConIva]];
+
+    db.query(sql, [values], (err, result) => {
+        if (err) {
+            console.error("❌ Error DB Compra:", err.message);
+            return res.status(500).json({ error: "Error al registrar la compra en la base de datos." });
+        }
+        res.json({ success: true, message: "Registro de compra guardado exitosamente." });
     });
 });
 
