@@ -187,7 +187,9 @@
         detail: document.getElementById('productDetailView'),
         profile: document.getElementById('userProfileView'),
         authModal: document.getElementById('authInterface'),
-        payModal: document.getElementById('paymentModal'), // Asegúrate de tener este ID en el HTML
+        reg: document.getElementById('registerView'),
+        log: document.getElementById('loginView'),
+        ver: document.getElementById('verifyView'),
         cart: document.getElementById('cartSidebar'),
         menu: document.getElementById('sideMenu'),
         overlayCart: document.getElementById('cartOverlay'),
@@ -210,104 +212,257 @@
         ui.overlayMenu.classList.remove('show');
     };
 
-    // --- CARRITO ---
+    // EVENTOS DE PANELES
+    document.getElementById('openCartBtn').onclick = () => { ui.cart.classList.add('open'); ui.overlayCart.classList.add('show'); };
+    document.querySelector('.hamburger-menu').onclick = () => { ui.menu.classList.add('active'); ui.overlayMenu.classList.add('show'); };
+    [ui.overlayCart, ui.overlayMenu, document.getElementById('closeCart'), document.getElementById('closeMenu')].forEach(el => el.onclick = closePanels);
+
+    // --- PERFIL ---
+    const abrirPerfil = (e) => {
+        if(e) e.preventDefault();
+        closePanels();
+        const rawData = sessionStorage.getItem('usuarioActive');
+        if (rawData) {
+            const userSession = JSON.parse(rawData);
+            document.getElementById('profileNombre').value = userSession.nombre || '';
+            document.getElementById('profileCorreo').value = userSession.correo || '';
+            document.getElementById('profileTelefono').value = userSession.telefono || '';
+            document.getElementById('profileDireccion').value = userSession.direccion || '';
+            showView('profile');
+        } else {
+            ui.authModal.classList.add('is-visible');
+        }
+    };
+
+    document.getElementById('menuMyAccount').onclick = abrirPerfil;
+    document.getElementById('btnBackFromProfile').onclick = () => showView('store');
+
+    document.getElementById('userBtn').onclick = (e) => {
+        const label = document.getElementById('userBtn').innerText;
+        if (label.includes('Hola')) abrirPerfil(e);
+        else ui.authModal.classList.add('is-visible');
+    };
+
+    // --- LOGIN ---
+    document.getElementById('btnEntrarLogin').onclick = async () => {
+        const correo = document.getElementById('loginUser').value;
+        const password = document.getElementById('loginPass').value;
+        try {
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({correo, password})
+            });
+            const data = await res.json();
+            if (res.ok) {
+                // Importante: El servidor debe enviar 'id' en data.user
+                sessionStorage.setItem('usuarioActive', JSON.stringify(data.user));
+                document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
+                ui.authModal.classList.remove('is-visible');
+                alert("¡Bienvenido!");
+            } else alert(data.error);
+        } catch (e) { alert("Error de conexión"); }
+    };
+
+    // --- GUARDAR PERFIL ---
+    document.getElementById('profileForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const currentSession = JSON.parse(sessionStorage.getItem('usuarioActive'));
+        const datosActualizados = {
+            nombre: document.getElementById('profileNombre').value,
+            correo: document.getElementById('profileCorreo').value,
+            telefono: document.getElementById('profileTelefono').value,
+            direccion: document.getElementById('profileDireccion').value,
+            rol: currentSession ? currentSession.rol : 'usuario'
+        };
+        try {
+            const res = await fetch('/update-profile', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(datosActualizados)
+            });
+            if (res.ok) {
+                sessionStorage.setItem('usuarioActive', JSON.stringify({...currentSession, ...datosActualizados}));
+                alert("✅ Perfil actualizado correctamente");
+            }
+        } catch (e) { alert("Error al guardar"); }
+    };
+
+    // --- SISTEMA DE CARRITO ---
     let cart = JSON.parse(localStorage.getItem('cartData')) || [];
 
     const updateCartUI = () => {
         const container = document.getElementById('cartItemsContainer');
         const badge = document.getElementById('mainCartBadge');
+        const label = document.getElementById('cartCountLabel');
         const totalDisplay = document.getElementById('cartTotalPrice');
+        
         container.innerHTML = '';
         let subtotal = 0;
         let count = 0;
 
         if (cart.length === 0) {
-            container.innerHTML = '<div style="text-align:center;margin-top:20px;">Vacío</div>';
+            container.innerHTML = '<div class="cart-empty-msg" style="text-align:center; margin-top:50px; color:#888;">Tu carrito está vacío.</div>';
         } else {
             cart.forEach((item, index) => {
                 subtotal += item.price * item.qty;
                 count += item.qty;
                 container.innerHTML += `
-                    <div style="padding:10px; border-bottom:1px solid #eee;">
-                        ${item.name} - $${item.price} x ${item.qty}
-                        <button onclick="removeItem(${index})" style="color:red;border:none;background:none;cursor:pointer;">[x]</button>
+                    <div class="cart-item" style="display:flex; align-items:center; gap:10px; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                        <img src="${item.img}" style="width:50px; height:50px; object-fit:cover;">
+                        <div style="flex:1;">
+                            <h4 style="margin:0; font-size:14px;">${item.name}</h4>
+                            <p style="margin:0; font-size:12px;">$${item.price.toFixed(2)} x ${item.qty}</p>
+                            <div style="display:flex; gap:5px; margin-top:5px;">
+                                <button onclick="changeQty(${index}, -1)">-</button>
+                                <button onclick="changeQty(${index}, 1)">+</button>
+                                <button onclick="removeItem(${index})" style="color:red; background:none; border:none; margin-left:10px; cursor:pointer;">Eliminar</button>
+                            </div>
+                        </div>
                     </div>`;
             });
         }
         badge.innerText = count;
+        label.innerText = count;
         totalDisplay.innerText = `$${subtotal.toFixed(2)}`;
         localStorage.setItem('cartData', JSON.stringify(cart));
     };
 
-    window.removeItem = (index) => { cart.splice(index, 1); updateCartUI(); };
-
-    // --- FINALIZAR COMPRA (Paso 1: Crear Venta) ---
-    document.querySelector('.checkout-btn').onclick = async () => {
-        const user = JSON.parse(sessionStorage.getItem('usuarioActive'));
-        if (!user || !user.id) return ui.authModal.classList.add('is-visible');
-        if (cart.length === 0) return alert("Carrito vacío");
-
-        const subtotal = cart.reduce((acc, p) => acc + (p.price * p.qty), 0);
-
-        try {
-            const res = await fetch('/preparar-pago', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ idCliente: user.id, productos: cart, subtotal })
-            });
-            const data = await res.json();
-
-            if (res.ok) {
-                // Llenar datos del modal de pago
-                document.getElementById('paymentRef').innerText = data.referencia;
-                document.getElementById('paymentAmount').innerText = `$${data.montoTotal.toFixed(2)}`;
-                
-                // Guardar datos en el formulario para el paso final
-                const form = document.getElementById('paymentForm');
-                form.dataset.idVenta = data.idVenta;
-                form.dataset.referencia = data.referencia;
-                form.dataset.monto = data.montoTotal;
-
-                closePanels();
-                ui.payModal.classList.add('is-visible');
-            }
-        } catch (e) { alert("Error al conectar con el servidor"); }
+    window.changeQty = (index, delta) => {
+        cart[index].qty += delta;
+        if (cart[index].qty < 1) return removeItem(index);
+        updateCartUI();
     };
 
-    // --- CONFIRMAR PAGO (Paso 2: Registrar en tabla PAGOS) ---
-    document.getElementById('paymentForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const form = e.target;
+    window.removeItem = (index) => {
+        cart.splice(index, 1);
+        updateCartUI();
+    };
+
+    document.getElementById('clearCart').onclick = () => {
+        if(confirm("¿Vaciar el carrito?")) { cart = []; updateCartUI(); }
+    };
+
+    // --- FINALIZAR COMPRA ---
+    document.querySelector('.checkout-btn').onclick = async () => {
+        const userSession = JSON.parse(sessionStorage.getItem('usuarioActive'));
+        
+        if (!userSession || !userSession.id) {
+            alert("Inicia sesión para finalizar tu compra.");
+            ui.authModal.classList.add('is-visible');
+            return;
+        }
+
+        if (cart.length === 0) return alert("Tu carrito está vacío.");
+
+        let subtotal = cart.reduce((acc, p) => acc + (p.price * p.qty), 0);
+        let totalConIva = subtotal * 1.16;
+
         const payload = {
-            idVenta: form.dataset.idVenta,
-            referencia: form.dataset.referencia,
-            metodoPago: document.getElementById('payMethod').value,
-            monto: form.dataset.monto
+            idUsuario: userSession.id,
+            productos: cart,
+            subtotal: subtotal,
+            totalConIva: totalConIva
         };
 
         try {
-            const res = await fetch('/registrar-pago', {
+            const res = await fetch('/finalizar-compra', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
+            const data = await res.json();
             if (res.ok) {
-                alert("✅ ¡Pago Exitoso! Gracias por tu compra.");
+                alert(`✅ ${data.message}\nTotal (IVA 16%): $${totalConIva.toFixed(2)}`);
                 cart = [];
                 updateCartUI();
-                ui.payModal.classList.remove('is-visible');
-                showView('store');
+                closePanels();
+            } else {
+                alert("Error: " + data.error);
             }
-        } catch (e) { alert("Error al procesar el pago"); }
+        } catch (e) { alert("Error de conexión con el servidor."); }
     };
 
-    // Eventos de apertura de Menú/Carrito
-    document.getElementById('openCartBtn').onclick = () => { ui.cart.classList.add('open'); ui.overlayCart.classList.add('show'); };
-    document.querySelector('.hamburger-menu').onclick = () => { ui.menu.classList.add('active'); ui.overlayMenu.classList.add('show'); };
-    [ui.overlayCart, ui.overlayMenu, document.getElementById('closeCart'), document.getElementById('closeMenu')].forEach(el => el.onclick = closePanels);
-    document.getElementById('closePayment').onclick = () => ui.payModal.classList.remove('is-visible');
+    // --- OTROS EVENTOS ---
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.onclick = () => {
+            document.getElementById('detailTitle').innerText = card.querySelector('.product-name').innerText;
+            document.getElementById('detailPrice').innerText = card.querySelector('.price-current').innerText;
+            document.getElementById('detailMainImg').src = card.querySelector('img').src;
+            showView('detail');
+        };
+    });
 
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('add-to-cart-btn')) {
+            const name = document.getElementById('detailTitle').innerText;
+            const price = parseFloat(document.getElementById('detailPrice').innerText.replace('$', ''));
+            const img = document.getElementById('detailMainImg').src;
+            const existingItem = cart.find(item => item.name === name);
+            if (existingItem) existingItem.qty++;
+            else cart.push({ name, price, img, qty: 1 });
+            alert("¡Añadido!");
+            updateCartUI();
+        }
+    });
+
+    document.getElementById('btnBackToStore').onclick = () => showView('store');
+    document.getElementById('closeAuth').onclick = () => ui.authModal.classList.remove('is-visible');
+    document.getElementById('toggleLogin').onclick = () => { ui.reg.style.display='none'; ui.log.style.display='flex'; };
+    document.getElementById('toggleRegister').onclick = () => { ui.log.style.display='none'; ui.reg.style.display='flex'; };
+
+    document.getElementById('menuLogout').onclick = (e) => {
+        e.preventDefault();
+        sessionStorage.clear();
+        document.getElementById('userBtn').innerHTML = `&#128100;`;
+        closePanels();
+        showView('store');
+        alert("Sesión cerrada.");
+    };
+
+    // Inicialización
     updateCartUI();
+
+    // --- RUTA: PROCESAR VENTA Y PREPARAR PAGO ---
+app.post('/preparar-pago', (req, res) => {
+    const { idUsuario, idCliente, productos, subtotal } = req.body;
+    
+    // 1. Calcular IVA (16%) y Total
+    const iva = subtotal * 0.16;
+    const total = subtotal + iva;
+    const fechaActual = new Date();
+
+    // 2. Insertar en tabla VENTAS 
+    const sqlVenta = "INSERT INTO VENTAS (Id_Cliente, Fecha, Subtotal, Total, Estado) VALUES (?, ?, ?, ?, 'Esperando Pago')";
+    
+    db.query(sqlVenta, [idCliente, fechaActual, subtotal, total], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        const idVentaGenerada = result.insertId;
+        
+        // 3. Generar Referencia Única para este pago
+        // Formato: V-[Año]-[ID Venta]-[Random]
+        const referenciaUnica = `REF-${fechaActual.getFullYear()}-${idVentaGenerada}-${Math.floor(Math.random()*1000)}`;
+
+        // 4. Mapear productos del carrito al detalle de la venta
+        const detalleValues = productos.map(p => [idVentaGenerada, p.id_prod, p.qty, p.price]);
+        const sqlDetalle = "INSERT INTO DETALLE_VENTA (Id_Venta, Id_Producto, Cantidad, Precio_Unitario) VALUES ?";
+
+        db.query(sqlDetalle, [detalleValues], (errDetalle) => {
+            if (errDetalle) return res.status(500).json({ error: "Error al guardar detalle" });
+
+            // 5. Devolver la referencia y el ID de venta para el formulario de pago
+            res.json({
+                success: true,
+                idVenta: idVentaGenerada,
+                referencia: referenciaUnica,
+                montoTotal: total,
+                message: "Venta preparada. Proceda al formulario de pago."
+            });
+        });
+    });
+});
 </script>
+
 </body>
 </html>
