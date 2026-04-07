@@ -143,155 +143,179 @@
         </div>
     </div>
 
-    <script>
-        const ui = {
-            store: document.getElementById('mainStoreView'),
-            detail: document.getElementById('productDetailView'),
-            profile: document.getElementById('userProfileView'),
-            authModal: document.getElementById('authInterface'),
-            reg: document.getElementById('registerView'),
-            log: document.getElementById('loginView'),
-            ver: document.getElementById('verifyView'),
-            cart: document.getElementById('cartSidebar'),
-            menu: document.getElementById('sideMenu'),
-            overlayCart: document.getElementById('cartOverlay'),
-            overlayMenu: document.getElementById('menuOverlay')
+<script>
+    const ui = {
+        store: document.getElementById('mainStoreView'),
+        detail: document.getElementById('productDetailView'),
+        profile: document.getElementById('userProfileView'),
+        authModal: document.getElementById('authInterface'),
+        reg: document.getElementById('registerView'),
+        log: document.getElementById('loginView'),
+        ver: document.getElementById('verifyView'),
+        cart: document.getElementById('cartSidebar'),
+        menu: document.getElementById('sideMenu'),
+        overlayCart: document.getElementById('cartOverlay'),
+        overlayMenu: document.getElementById('menuOverlay')
+    };
+
+    // NAVEGACIÓN PROTEGIDA
+    const showView = (viewName) => {
+        const mainViews = [ui.store, ui.detail, ui.profile];
+        mainViews.forEach(v => v.style.display = 'none');
+        ui[viewName].style.display = 'block';
+        ui.authModal.classList.remove('is-visible');
+        window.scrollTo(0,0);
+    };
+
+    const closePanels = () => {
+        ui.cart.classList.remove('open');
+        ui.menu.classList.remove('active');
+        ui.overlayCart.classList.remove('show');
+        ui.overlayMenu.classList.remove('show');
+    };
+
+    // EVENTOS DE PANELES LATERALES
+    document.getElementById('openCartBtn').onclick = () => { ui.cart.classList.add('open'); ui.overlayCart.classList.add('show'); };
+    document.querySelector('.hamburger-menu').onclick = () => { ui.menu.classList.add('active'); ui.overlayMenu.classList.add('show'); };
+    [ui.overlayCart, ui.overlayMenu, document.getElementById('closeCart'), document.getElementById('closeMenu')].forEach(el => el.onclick = closePanels);
+
+    // LÓGICA DE PERFIL (CONSULTA DESDE SESIÓN)
+    const abrirPerfil = (e) => {
+        if(e) e.preventDefault();
+        closePanels();
+        
+        const rawData = sessionStorage.getItem('usuarioActive');
+        if (rawData) {
+            const userSession = JSON.parse(rawData);
+            // Llenamos el formulario con lo que tenemos en memoria
+            document.getElementById('profileNombre').value = userSession.nombre || '';
+            document.getElementById('profileCorreo').value = userSession.correo || '';
+            document.getElementById('profileTelefono').value = userSession.telefono || '';
+            document.getElementById('profileDireccion').value = userSession.direccion || '';
+            showView('profile');
+        } else {
+            ui.authModal.classList.add('is-visible');
+        }
+    };
+
+    document.getElementById('menuMyAccount').onclick = abrirPerfil;
+    document.getElementById('btnBackFromProfile').onclick = () => showView('store');
+
+    document.getElementById('userBtn').onclick = (e) => {
+        const label = document.getElementById('userBtn').innerText;
+        if (label.includes('Hola')) abrirPerfil(e);
+        else ui.authModal.classList.add('is-visible');
+    };
+
+    // LOGIN CON PERSISTENCIA
+    document.getElementById('btnEntrarLogin').onclick = async () => {
+        const correo = document.getElementById('loginUser').value;
+        const password = document.getElementById('loginPass').value;
+        try {
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({correo, password})
+            });
+            const data = await res.json();
+            if (res.ok) {
+                // El servidor envía: { nombre, correo, telefono, direccion, rol }
+                sessionStorage.setItem('usuarioActive', JSON.stringify(data.user));
+                document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
+                ui.authModal.classList.remove('is-visible');
+                alert("¡Bienvenido!");
+            } else alert(data.error);
+        } catch (e) { alert("Error de conexión"); }
+    };
+
+    // GUARDAR PERFIL (CORREGIDO PARA EVITAR CIERRE DE SESIÓN)
+    document.getElementById('profileForm').onsubmit = async (e) => {
+        e.preventDefault();
+        
+        // Recuperamos el objeto actual para no perder el ROL u otros datos ocultos
+        const currentSession = JSON.parse(sessionStorage.getItem('usuarioActive'));
+        
+        const datosActualizados = {
+            nombre: document.getElementById('profileNombre').value,
+            correo: document.getElementById('profileCorreo').value, // Siempre readonly
+            telefono: document.getElementById('profileTelefono').value,
+            direccion: document.getElementById('profileDireccion').value,
+            rol: currentSession ? currentSession.rol : 'usuario' // Mantenemos el rol
         };
 
-        // NAVEGACIÓN PROTEGIDA (No oculta sidebars)
-        const showView = (viewName) => {
-            const mainViews = [ui.store, ui.detail, ui.profile];
-            mainViews.forEach(v => v.style.display = 'none');
-            ui[viewName].style.display = 'block';
-            ui.authModal.classList.remove('is-visible');
-            window.scrollTo(0,0);
-        };
+        try {
+            const res = await fetch('/update-profile', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(datosActualizados)
+            });
+            const data = await res.json();
 
-        const closePanels = () => {
-            ui.cart.classList.remove('open');
-            ui.menu.classList.remove('active');
-            ui.overlayCart.classList.remove('show');
-            ui.overlayMenu.classList.remove('show');
-        };
-
-        // EVENTOS DE PANELES LATERALES
-        document.getElementById('openCartBtn').onclick = () => { ui.cart.classList.add('open'); ui.overlayCart.classList.add('show'); };
-        document.querySelector('.hamburger-menu').onclick = () => { ui.menu.classList.add('active'); ui.overlayMenu.classList.add('show'); };
-        [ui.overlayCart, ui.overlayMenu, document.getElementById('closeCart'), document.getElementById('closeMenu')].forEach(el => el.onclick = closePanels);
-
-        // LÓGICA DE PERFIL (CONSULTA DESDE SESIÓN)
-        const abrirPerfil = (e) => {
-            if(e) e.preventDefault();
-            closePanels();
-            
-            const userSession = JSON.parse(sessionStorage.getItem('usuarioActive'));
-            if (userSession) {
-                document.getElementById('profileNombre').value = userSession.nombre;
-                document.getElementById('profileCorreo').value = userSession.correo;
-                document.getElementById('profileTelefono').value = userSession.telefono || '';
-                document.getElementById('profileDireccion').value = userSession.direccion || '';
-                showView('profile');
+            if (res.ok) {
+                // Actualizamos la mochila de datos local
+                sessionStorage.setItem('usuarioActive', JSON.stringify(datosActualizados));
+                // Actualizamos el nombre en el header
+                document.getElementById('userBtn').innerHTML = `<span>Hola, ${datosActualizados.nombre}</span>`;
+                alert("✅ Datos guardados correctamente.");
             } else {
-                ui.authModal.classList.add('is-visible');
+                alert("❌ Error: " + data.error);
             }
-        };
+        } catch (e) { 
+            alert("Error de red al intentar guardar."); 
+        }
+    };
 
-        document.getElementById('menuMyAccount').onclick = abrirPerfil;
-        document.getElementById('btnBackFromProfile').onclick = () => showView('store');
-
-        // BOTÓN USUARIO HEADER
-        document.getElementById('userBtn').onclick = (e) => {
-            const label = document.getElementById('userBtn').innerText;
-            if (label.includes('Hola')) abrirPerfil(e);
-            else ui.authModal.classList.add('is-visible');
-        };
-
-        // LOGIN CON PERSISTENCIA
-        document.getElementById('btnEntrarLogin').onclick = async () => {
-            const correo = document.getElementById('loginUser').value;
-            const password = document.getElementById('loginPass').value;
-            try {
-                const res = await fetch('/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({correo, password})
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    sessionStorage.setItem('usuarioActive', JSON.stringify(data.user));
-                    document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
-                    ui.authModal.classList.remove('is-visible');
-                } else alert(data.error);
-            } catch (e) { alert("Error de conexión"); }
-        };
-
-        // GUARDAR PERFIL EN BD Y SESIÓN
-        document.getElementById('profileForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const datos = {
-                nombre: document.getElementById('profileNombre').value,
-                correo: document.getElementById('profileCorreo').value,
-                telefono: document.getElementById('profileTelefono').value,
-                direccion: document.getElementById('profileDireccion').value
-            };
-            try {
-                const res = await fetch('/update-profile', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(datos)
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    sessionStorage.setItem('usuarioActive', JSON.stringify(datos));
-                    document.getElementById('userBtn').innerHTML = `<span>Hola, ${datos.nombre}</span>`;
-                    alert("✅ Perfil actualizado correctamente");
-                } else alert(data.error);
-            } catch (e) { alert("Error al guardar"); }
-        };
-
-        // OTROS EVENTOS
-        document.getElementById('btnRegistrarFinal').onclick = async () => {
-            const correo = document.getElementById('regCorreo').value;
-            const res = await fetch('/register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ nombre: document.getElementById('regNombre').value, correo, password: document.getElementById('regPass').value })
-            });
-            if (res.ok) { localStorage.setItem('emailPendiente', correo); ui.reg.style.display = 'none'; ui.ver.style.display = 'flex'; }
-        };
-
-        document.getElementById('btnConfirmarCodigo').onclick = async () => {
-            const res = await fetch('/verify', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ correo: localStorage.getItem('emailPendiente'), codigo: document.getElementById('inputCodigo').value })
-            });
-            if (res.ok) { alert("Cuenta activada."); ui.ver.style.display = 'none'; ui.log.style.display = 'flex'; }
-        };
-
-        document.querySelectorAll('.product-card').forEach(card => {
-            card.onclick = () => {
-                document.getElementById('detailTitle').innerText = card.querySelector('.product-name').innerText;
-                document.getElementById('detailPrice').innerText = card.querySelector('.price-current').innerText;
-                document.getElementById('detailMainImg').src = card.querySelector('img').src;
-                showView('detail');
-            };
+    // REGISTRO Y VERIFICACIÓN
+    document.getElementById('btnRegistrarFinal').onclick = async () => {
+        const correo = document.getElementById('regCorreo').value;
+        const res = await fetch('/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ nombre: document.getElementById('regNombre').value, correo, password: document.getElementById('regPass').value })
         });
-        document.getElementById('btnBackToStore').onclick = () => showView('store');
-        document.getElementById('closeAuth').onclick = () => ui.authModal.classList.remove('is-visible');
-        document.getElementById('toggleLogin').onclick = () => { ui.reg.style.display='none'; ui.log.style.display='flex'; };
-        document.getElementById('toggleRegister').onclick = () => { ui.log.style.display='none'; ui.reg.style.display='flex'; };
+        if (res.ok) { 
+            localStorage.setItem('emailPendiente', correo); 
+            ui.reg.style.display = 'none'; 
+            ui.ver.style.display = 'flex'; 
+        }
+    };
 
-        // LOGOUT TOTAL
-        document.getElementById('menuLogout').onclick = (e) => {
-            e.preventDefault();
-            sessionStorage.clear();
-            localStorage.clear();
-            document.getElementById('userBtn').innerHTML = `&#128100;`;
-            closePanels();
-            showView('store');
-            alert("Sesión cerrada.");
+    document.getElementById('btnConfirmarCodigo').onclick = async () => {
+        const res = await fetch('/verify', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ correo: localStorage.getItem('emailPendiente'), codigo: document.getElementById('inputCodigo').value })
+        });
+        if (res.ok) { 
+            alert("Cuenta activada. Ahora puedes iniciar sesión."); 
+            ui.ver.style.display = 'none'; 
+            ui.log.style.display = 'flex'; 
+        }
+    };
+
+    // PRODUCTOS
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.onclick = () => {
+            document.getElementById('detailTitle').innerText = card.querySelector('.product-name').innerText;
+            document.getElementById('detailPrice').innerText = card.querySelector('.price-current').innerText;
+            document.getElementById('detailMainImg').src = card.querySelector('img').src;
+            showView('detail');
         };
-    </script>
+    });
+    document.getElementById('btnBackToStore').onclick = () => showView('store');
+    document.getElementById('closeAuth').onclick = () => ui.authModal.classList.remove('is-visible');
+    document.getElementById('toggleLogin').onclick = () => { ui.reg.style.display='none'; ui.log.style.display='flex'; };
+    document.getElementById('toggleRegister').onclick = () => { ui.log.style.display='none'; ui.reg.style.display='flex'; };
+
+    // LOGOUT
+    document.getElementById('menuLogout').onclick = (e) => {
+        e.preventDefault();
+        sessionStorage.clear();
+        document.getElementById('userBtn').innerHTML = `&#128100;`;
+        closePanels();
+        showView('store');
+        alert("Sesión cerrada.");
+    };
+</script>
 </body>
 </html>

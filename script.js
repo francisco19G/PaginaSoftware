@@ -88,19 +88,32 @@ app.post('/login', (req, res) => {
 });
 
 // --- RUTA: ACTUALIZAR PERFIL ---
+// --- RUTA: ACTUALIZAR PERFIL CORREGIDA ---
 app.post('/update-profile', (req, res) => {
     const { nombre, correo, telefono, direccion } = req.body;
+
+    // Buscamos el ID
     db.query("SELECT Id_Usuario FROM USUARIOS WHERE Correo = ?", [correo], (err, results) => {
-        if (results.length === 0) return res.status(404).json({ error: "Usuario no encontrado." });
+        if (err || results.length === 0) return res.status(404).json({ error: "Usuario no encontrado" });
+
         const idU = results[0].Id_Usuario;
 
+        // Intentamos actualizar CLIENTES
         db.query("SELECT Id_Cliente FROM CLIENTES WHERE Id_Usuario = ?", [idU], (err, clients) => {
             if (clients.length > 0) {
+                // UPDATE
                 const sqlUpd = "UPDATE CLIENTES SET Nombre=?, Telefono=?, Direccion=?, Correo=? WHERE Id_Usuario=?";
-                db.query(sqlUpd, [nombre, telefono, direccion, correo, idU], () => res.json({ success: true }));
+                db.query(sqlUpd, [nombre, telefono, direccion, correo, idU], (err) => {
+                    if (err) return res.status(500).json({ error: "Error al actualizar" });
+                    res.json({ success: true, message: "Perfil actualizado" });
+                });
             } else {
+                // INSERT
                 const sqlIns = "INSERT INTO CLIENTES (Id_Usuario, Nombre, Correo, Telefono, Direccion) VALUES (?,?,?,?,?)";
-                db.query(sqlIns, [idU, nombre, correo, telefono, direccion], () => res.json({ success: true }));
+                db.query(sqlIns, [idU, nombre, correo, telefono, direccion], (err) => {
+                    if (err) return res.status(500).json({ error: "Error al crear perfil" });
+                    res.json({ success: true, message: "Perfil guardado" });
+                });
             }
         });
     });
