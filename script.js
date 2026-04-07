@@ -17,23 +17,20 @@ const db = mysql.createPool({
     connectionLimit: 10
 });
 
-// --- RUTA: REGISTRO SIMPLIFICADO (SIN VERIFICACIÓN) ---
 app.post('/register', (req, res) => {
     const { nombre, correo, password } = req.body;
     
-    // Al registrar, establecemos 'verificado' en 1 inmediatamente 
+    // Mencionamos explícitamente las columnas para que MySQL no se confunda
     const sql = "INSERT INTO USUARIOS (Nombre, Correo, Contrasena, Rol, verificado) VALUES (?, ?, ?, 'usuario', 1)";
     
     db.query(sql, [nombre, correo, password], (err) => {
         if (err) {
-            console.error("Error en registro:", err.message);
-            return res.status(500).json({ error: "El correo ya existe o hubo un error en la base de datos." });
+            console.error("Error en MySQL:", err.sqlMessage); // Esto te dirá el error exacto en Render
+            return res.status(500).json({ error: "No se pudo registrar el usuario." });
         }
-        
-        res.json({ success: true, message: "Registro exitoso. Ya puedes iniciar sesión." });
+        res.json({ success: true, message: "Registro exitoso." });
     });
 });
-
 // --- RUTA: LOGIN ---
 app.post('/login', (req, res) => {
     const { correo, password } = req.body;
