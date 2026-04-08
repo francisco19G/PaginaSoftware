@@ -85,7 +85,6 @@
                     <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">Total a Pagar (IVA 16% inc.):</p>
                     <h3 id="paymentAmount" style="margin: 5px 0; color: #ff5722;">$0.00</h3>
                 </div>
-
                 <form id="paymentForm">
                     <div class="form-group">
                         <label>Método de Pago</label>
@@ -108,7 +107,7 @@
             <div class="profile-card" style="max-width: 500px; margin: 40px auto; padding: 30px; border: 1px solid #ddd; background: #fff; border-radius: 8px;">
                 <h2>Mi Perfil</h2>
                 <form id="profileForm">
-                    <div class="form-group"><label>Nombre</label><input type="text" id="profileNombre" class="form-input"></div>
+                    <div class="form-group"><label>Nombre</label><input type="text" id="profileNombre" class="form-input" required></div>
                     <div class="form-group"><label>Correo</label><input type="email" id="profileCorreo" class="form-input" readonly></div>
                     <div class="form-group"><label>Teléfono</label><input type="tel" id="profileTelefono" class="form-input"></div>
                     <div class="form-group"><label>Dirección</label><textarea id="profileDireccion" class="form-input"></textarea></div>
@@ -144,7 +143,7 @@
             <button id="btnBackToStore">← Volver</button>
             <h1 id="detailTitle"></h1>
             <h2 id="detailPrice"></h2>
-            <img id="detailMainImg" src="" style="width: 200px;">
+            <img id="detailMainImg" src="" style="width: 200px; display: block; margin: 20px 0;">
             <button class="add-to-cart-btn">Añadir al Carrito</button>
         </div>
     </div>
@@ -167,7 +166,6 @@
     const showView = (viewName) => {
         [ui.store, ui.detail, ui.profile].forEach(v => v.style.display = 'none');
         ui[viewName].style.display = 'block';
-        ui.authModal.classList.remove('is-visible');
         window.scrollTo(0,0);
     };
 
@@ -176,16 +174,10 @@
         ui.menu.classList.remove('active');
         ui.overlayCart.classList.remove('show');
         ui.overlayMenu.classList.remove('show');
+        ui.payModal.classList.remove('is-visible');
     };
 
-    // EVENTOS BÁSICOS
-    document.getElementById('openCartBtn').onclick = () => { ui.cart.classList.add('open'); ui.overlayCart.classList.add('show'); };
-    document.querySelector('.hamburger-menu').onclick = () => { ui.menu.classList.add('active'); ui.overlayMenu.classList.add('show'); };
-    [ui.overlayCart, ui.overlayMenu, document.getElementById('closeCart'), document.getElementById('closeMenu'), document.getElementById('closePayment')].forEach(el => {
-        if(el) el.onclick = closePanels;
-    });
-
-    // --- SISTEMA DE CARRITO ---
+    // --- CARRITO LOGIC ---
     let cart = JSON.parse(localStorage.getItem('cartData')) || [];
 
     const updateCartUI = () => {
@@ -193,10 +185,14 @@
         let subtotal = 0;
         let count = 0;
         container.innerHTML = '';
-        cart.forEach((item) => {
+        cart.forEach((item, index) => {
             subtotal += item.price * item.qty;
             count += item.qty;
-            container.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">${item.name} - $${item.price} x ${item.qty}</div>`;
+            container.innerHTML += `
+                <div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                    <span>${item.name} (x${item.qty})</span>
+                    <span>$${(item.price * item.qty).toFixed(2)}</span>
+                </div>`;
         });
         document.getElementById('mainCartBadge').innerText = count;
         document.getElementById('cartCountLabel').innerText = count;
@@ -204,11 +200,21 @@
         localStorage.setItem('cartData', JSON.stringify(cart));
     };
 
+    // --- EVENTOS ---
+    document.getElementById('openCartBtn').onclick = () => { ui.cart.classList.add('open'); ui.overlayCart.classList.add('show'); };
+    document.querySelector('.hamburger-menu').onclick = () => { ui.menu.classList.add('active'); ui.overlayMenu.classList.add('show'); };
+    [ui.overlayCart, ui.overlayMenu, document.getElementById('closeCart'), document.getElementById('closeMenu'), document.getElementById('closePayment'), document.getElementById('closeAuth')].forEach(el => {
+        if(el) el.onclick = () => { closePanels(); ui.authModal.classList.remove('is-visible'); };
+    });
+
+    document.getElementById('btnBackToStore').onclick = () => showView('store');
+    document.getElementById('btnBackFromProfile').onclick = () => showView('store');
+
     // --- AUTH ---
     document.getElementById('btnRegistrarFinal').onclick = async () => {
         const datos = { nombre: document.getElementById('regNombre').value, correo: document.getElementById('regCorreo').value, password: document.getElementById('regPass').value };
         const res = await fetch('/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(datos)});
-        if (res.ok) { alert("Registro exitoso. Ya puedes iniciar sesión."); ui.reg.style.display = 'none'; ui.log.style.display = 'block'; }
+        if (res.ok) { alert("Registro exitoso. Ya puedes entrar."); ui.reg.style.display = 'none'; ui.log.style.display = 'block'; }
     };
 
     document.getElementById('btnEntrarLogin').onclick = async () => {
@@ -216,26 +222,28 @@
         const data = await res.json();
         if (res.ok) {
             sessionStorage.setItem('usuarioActive', JSON.stringify(data.user));
-            document.getElementById('userBtn').innerHTML = `<span>Hola, ${data.user.nombre}</span>`;
-            ui.authModal.classList.remove('is-visible');
+            location.reload(); // Recargar para aplicar cambios
         } else alert(data.error);
     };
 
-    // --- PROCESO DE COMPRA ---
+    document.getElementById('menuLogout').onclick = () => {
+        sessionStorage.removeItem('usuarioActive');
+        location.reload();
+    };
+
+    // --- COMPRA ---
     document.querySelector('.checkout-btn').onclick = async () => {
         const user = JSON.parse(sessionStorage.getItem('usuarioActive'));
-        if (!user || !user.id) { ui.authModal.classList.add('is-visible'); return; }
+        if (!user) { ui.authModal.classList.add('is-visible'); return; }
         if (cart.length === 0) return alert("Carrito vacío");
 
         const subtotal = cart.reduce((acc, p) => acc + (p.price * p.qty), 0);
-
         const res = await fetch('/preparar-pago', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idCliente: user.id, productos: cart, subtotal })
         });
         const data = await res.json();
-
         if (res.ok) {
             document.getElementById('paymentRef').innerText = data.referencia;
             document.getElementById('paymentAmount').innerText = `$${data.montoTotal.toFixed(2)}`;
@@ -256,10 +264,10 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idVenta: form.dataset.idVenta, referencia: form.dataset.referencia, metodoPago: document.getElementById('payMethod').value, monto: form.dataset.monto })
         });
-        if (res.ok) { alert("✅ Pago Exitoso. ¡Gracias!"); cart = []; updateCartUI(); ui.payModal.classList.remove('is-visible'); showView('store'); }
+        if (res.ok) { alert("✅ Pago Exitoso!"); cart = []; updateCartUI(); closePanels(); showView('store'); }
     };
 
-    // PRODUCTOS
+    // --- PRODUCTOS ---
     document.querySelectorAll('.product-card').forEach(card => {
         card.onclick = () => {
             document.getElementById('detailTitle').innerText = card.querySelector('.product-name').innerText;
@@ -271,25 +279,59 @@
     });
 
     document.querySelector('.add-to-cart-btn').onclick = function() {
-        cart.push({ id: this.dataset.id, name: document.getElementById('detailTitle').innerText, price: parseFloat(document.getElementById('detailPrice').innerText.replace('$','')), qty: 1 });
-        alert("Añadido");
+        const id = this.dataset.id;
+        const name = document.getElementById('detailTitle').innerText;
+        const price = parseFloat(document.getElementById('detailPrice').innerText.replace('$',''));
+        const item = cart.find(p => p.id === id);
+        if(item) item.qty++; else cart.push({id, name, price, qty: 1});
+        updateCartUI();
+        alert("Añadido al carrito");
+    };
+
+    document.getElementById('clearCart').onclick = () => { cart = []; updateCartUI(); };
+
+    // --- PERFIL ---
+    document.getElementById('userBtn').onclick = () => {
+        const user = JSON.parse(sessionStorage.getItem('usuarioActive'));
+        if (user) {
+            document.getElementById('profileNombre').value = user.nombre;
+            document.getElementById('profileCorreo').value = user.correo;
+            document.getElementById('profileTelefono').value = user.telefono || '';
+            document.getElementById('profileDireccion').value = user.direccion || '';
+            showView('profile');
+        } else ui.authModal.classList.add('is-visible');
+    };
+
+    document.getElementById('profileForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const user = JSON.parse(sessionStorage.getItem('usuarioActive'));
+        const datos = { 
+            nombre: document.getElementById('profileNombre').value, 
+            correo: user.correo,
+            telefono: document.getElementById('profileTelefono').value,
+            direccion: document.getElementById('profileDireccion').value
+        };
+        const res = await fetch('/update-profile', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(datos)});
+        if(res.ok) {
+            alert("Perfil Actualizado");
+            user.nombre = datos.nombre; user.telefono = datos.telefono; user.direccion = datos.direccion;
+            sessionStorage.setItem('usuarioActive', JSON.stringify(user));
+            document.getElementById('userBtn').innerHTML = `<span>Hola, ${user.nombre}</span>`;
+        }
+    };
+
+    // --- INICIALIZACIÓN ---
+    window.onload = () => {
+        const user = sessionStorage.getItem('usuarioActive');
+        if (user) {
+            const u = JSON.parse(user);
+            document.getElementById('userBtn').innerHTML = `<span>Hola, ${u.nombre}</span>`;
+        }
         updateCartUI();
     };
 
     document.getElementById('toggleLogin').onclick = () => { ui.reg.style.display='none'; ui.log.style.display='block'; };
     document.getElementById('toggleRegister').onclick = () => { ui.log.style.display='none'; ui.reg.style.display='block'; };
-    document.getElementById('closeAuth').onclick = () => ui.authModal.classList.remove('is-visible');
-    document.getElementById('userBtn').onclick = () => {
-        const user = sessionStorage.getItem('usuarioActive');
-        if (user) {
-            const u = JSON.parse(user);
-            document.getElementById('profileNombre').value = u.nombre;
-            document.getElementById('profileCorreo').value = u.correo;
-            showView('profile');
-        } else ui.authModal.classList.add('is-visible');
-    };
-
-    updateCartUI();
 </script>
 </body>
 </html>
